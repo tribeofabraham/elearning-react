@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Embedding the quiz · Tribe of Abraham e-learning</title>
+  <meta name="description" content="The MIDI quiz embedded in a page, with the messages it sends the page as you take it." />
+  <link rel="icon" href="favicon.ico" sizes="any" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sorts+Mill+Goudy&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* A stand-in for "any page": the quiz sizes itself to the frame and reports what happens */
+    :root { --bg: #000; --surface: #15110b; --line: #3a3020; --paper: #f4efe6; --cream: #e8e0d0; --muted: #a89c88; --brass-light: #d4aa55; }
+    * { box-sizing: border-box; margin: 0; }
+    body { background: var(--bg); color: var(--cream); font: 1rem/1.6 'DM Sans', system-ui, sans-serif; padding: 2rem 1rem; }
+    main { max-width: 64rem; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
+    h1, h2 { font-family: 'Sorts Mill Goudy', Georgia, serif; font-weight: 400; color: var(--paper); font-variant-numeric: lining-nums; }
+    h1 { font-size: 2rem; }
+    h2 { font-size: 1.3rem; margin-bottom: 0.5rem; }
+    a { color: var(--brass-light); }
+    code, pre { font-family: Consolas, monospace; font-size: 0.85rem; }
+    pre { background: var(--surface); border: 1px solid var(--line); border-radius: 0.4rem; padding: 1rem; overflow: auto; color: var(--cream); }
+    .frame { width: 100%; height: 44rem; border: 1px solid var(--line); border-radius: 0.6rem; display: block; background: #000; }
+    .log { list-style: none; padding: 0; display: grid; gap: 0.3rem; max-height: 16rem; overflow: auto; }
+    .log li { background: var(--surface); border-left: 3px solid var(--brass-light); padding: 0.3rem 0.7rem; font-family: Consolas, monospace; font-size: 0.85rem; }
+    .muted { color: var(--muted); }
+    :focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>The quiz, embedded in a page</h1>
+      <p>This page stands in for any site, course page or LMS. The quiz below is an ordinary iframe: it records its own xAPI statements, sizes itself to the frame, and tells this page what's happening.</p>
+    </header>
+
+    <iframe class="frame" src="./?quiz=midi-basics" title="MIDI Basics quiz"></iframe>
+
+    <section aria-labelledby="log-title">
+      <h2 id="log-title">Messages from the quiz</h2>
+      <p class="muted" id="log-empty">None yet. Start the quiz above.</p>
+      <!-- Announced as they arrive, so a screen reader hears the page react -->
+      <ol class="log" id="log" aria-live="polite" tabindex="0" aria-label="Messages from the quiz"></ol>
+    </section>
+
+    <section aria-labelledby="code-title">
+      <h2 id="code-title">The embed code</h2>
+      <pre tabindex="0"><code>&lt;iframe src="https://YOUR-SERVER/?quiz=midi-basics" title="MIDI Basics quiz"
+        style="width:100%; height:44rem; border:0"&gt;&lt;/iframe&gt;
+
+&lt;script&gt;
+  window.addEventListener('message', (e) =&gt; {
+    if (e.data?.source !== 'elearning-react') return
+    if (e.data.type === 'finished') console.log('Score', e.data.score.scaled, 'passed', e.data.passed)
+  })
+&lt;/script&gt;</code></pre>
+    </section>
+  </main>
+
+  <script>
+    const log = document.getElementById('log')
+    window.addEventListener('message', (e) => {
+      const m = e.data
+      if (m?.source !== 'elearning-react' || m.type === 'resize') return
+      document.getElementById('log-empty').hidden = true
+      const { source, type, ...rest } = m
+      const li = document.createElement('li')
+      li.textContent = `${type}  ${JSON.stringify(rest)}`
+      log.append(li)
+      log.scrollTop = log.scrollHeight
+    })
+  </script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+import { useEffect, useRef } from 'react'
+import { correctResponse, isCorrect, responseText, scoreAttempt } from '../../shared/quiz.js'
+
+// The score, whether it passed, every question with the learner's answer, and the xAPI statements
+// that were recorded (the point of the sample: what an LRS receives).
+export default function Results({ quiz, responses, finishState, statements, onRetrySave, onRestart }) {
+  const { raw, max, scaled, passed } = scoreAttempt(quiz, responses)
+  const percent = Math.round(scaled * 100)
+  const passMark = Math.round(quiz.passingScore * 100)
+  const headingRef = useRef(null)
+  useEffect(() => { headingRef.current?.focus() }, [])
+
+  return (
+    <section className="card results" aria-labelledby="results-title">
+      <p className="eyebrow">{quiz.title}</p>
+      <h1 id="results-title" ref={headingRef} tabIndex={-1}>
+        You scored {raw} of {max} <span className="percent">({percent}%)</span>
+      </h1>
+      <p className={`verdict ${passed ? 'is-right' : 'is-wrong'}`}>
+        {passed ? `Passed. The pass mark is ${passMark}%.` : `Not passed yet. The pass mark is ${passMark}%.`}
+      </p>
+
+      <p className="saved" role="status">
+        {finishState === 'saving' && 'Recording your score…'}
+        {finishState === 'saved' && 'Your score has been recorded.'}
+        {finishState === 'failed' && 'Your score could not be recorded.'}
+      </p>
+      {finishState === 'failed' && <button type="button" className="secondary" onClick={onRetrySave}>Try recording again</button>}
+
+      <h2 className="review-title">Your answers</h2>
+      <ol className="review">
+        {quiz.questions.map((q) => {
+          const ok = isCorrect(q, responses[q.id])
+          return (
+            <li key={q.id} className={ok ? 'is-right' : 'is-wrong'}>
+              <p className="review-q">{q.prompt}</p>
+              <p className="review-a">
+                <span className="review-mark">{ok ? '✓ Right' : '✗ Wrong'}:</span>{' '}
+                {responseText(q, responses[q.id]) || 'not answered'}
+                {!ok && <> <span className="review-right">(answer: {responseText(q, correctResponse(q))})</span></>}
+              </p>
+            </li>
+          )
+        })}
+      </ol>
+
+      <div className="actions">
+        <button type="button" className="primary" onClick={onRestart}>Take it again</button>
+      </div>
+
+      {statements && (
+        <details className="statements">
+          <summary>See the {statements.length} xAPI statements this attempt recorded</summary>
+          {/* Focusable so it can be scrolled from the keyboard */}
+          <pre tabIndex={0} aria-label="xAPI statements">{JSON.stringify(statements, null, 2)}</pre>
+        </details>
+      )}
+    </section>
+  )
+}

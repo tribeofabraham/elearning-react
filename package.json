@@ -1,0 +1,30 @@
+{
+  "name": "elearning-react",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -n server,client -c blue,magenta \"npm run server\" \"vite\"",
+    "server": "node --watch --env-file-if-exists=.env server/index.js",
+    "build": "vite build",
+    "start": "node --env-file-if-exists=.env server/index.js",
+    "test": "node --test \"shared/**/*.test.js\" \"src/**/*.test.js\"",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.1.1",
+    "concurrently": "^10.0.5",
+    "vite": "^8.3.0"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "overrides": {
+    "shell-quote": "^1.11.0"
+  }
+}
