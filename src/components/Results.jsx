@@ -1,9 +1,9 @@
 import { useEffect, useRef } from 'react'
 import { correctResponse, isCorrect, responseText, scoreAttempt } from '../../shared/quiz.js'
 
-// The score, whether it passed, every question with the learner's answer, and the xAPI statements
-// that were recorded (the point of the sample: what an LRS receives).
-export default function Results({ quiz, responses, finishState, statements, onRetrySave, onRestart }) {
+// The score, whether it passed, and every question with the learner's answer. (What was recorded is in
+// the xAPI panel.)
+export default function Results({ quiz, responses, finishState, onRetrySave, onRestart }) {
   const { raw, max, scaled, passed } = scoreAttempt(quiz, responses)
   const percent = Math.round(scaled * 100)
   const passMark = Math.round(quiz.passingScore * 100)
@@ -47,14 +47,6 @@ export default function Results({ quiz, responses, finishState, statements, onRe
       <div className="actions">
         <button type="button" className="primary" onClick={onRestart}>Take it again</button>
       </div>
-
-      {statements && (
-        <details className="statements">
-          <summary>See the {statements.length} xAPI statements this attempt recorded</summary>
-          {/* Focusable so it can be scrolled from the keyboard */}
-          <pre tabIndex={0} aria-label="xAPI statements">{JSON.stringify(statements, null, 2)}</pre>
-        </details>
-      )}
     </section>
   )
 }

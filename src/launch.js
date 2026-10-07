@@ -1,6 +1,7 @@
 // How the quiz was opened, from its address.
 //
 //   ?quiz=midi-basics                        which quiz (the default if left out)
+//   &xapi-panel=0                            hide the live xAPI panel (shown by default)
 //
 // An LMS or LRS that launches the quiz the standard xAPI way ("Tin Can launch") adds its own LRS and
 // learner, and the page then sends statements there itself:
@@ -39,7 +40,7 @@ export function readLaunch(search = window.location.search) {
       }
     : null
 
-  return { quiz, lms }
+  return { quiz, lms, showPanel: params.get('xapi-panel') !== '0' }
 }
 
 // A name to show for an LMS's learner.

@@ -14,13 +14,13 @@ const contrast = (a, b) => {
 }
 const css = readFileSync(new URL('./index.css', import.meta.url), 'utf8')
 const token = (name) => css.match(new RegExp(String.raw`--${name}:\s*(#[0-9a-f]{6})`, 'i'))[1]
-const [BG, SURFACE, RAISED, EDGE, PAPER, CREAM, MUTED, BRASS, BRASS_LIGHT, RIGHT, WRONG] =
-  ['bg', 'surface', 'raised', 'edge', 'paper', 'cream', 'muted', 'brass', 'brass-light', 'right', 'wrong'].map(token)
+const [BG, SURFACE, RAISED, PANEL, EDGE, PAPER, CREAM, MUTED, BRASS, BRASS_LIGHT, RIGHT, WRONG] =
+  ['bg', 'surface', 'raised', 'panel', 'edge', 'paper', 'cream', 'muted', 'brass', 'brass-light', 'right', 'wrong'].map(token)
 
 const check = (fg, bg, min) => assert.ok(contrast(fg, bg) >= min, `${fg} on ${bg}: ${contrast(fg, bg).toFixed(2)} < ${min}`)
 
-test('text reads at 4.5:1 on the page, the card and a picked answer', () => {
-  for (const fg of [PAPER, CREAM, MUTED, BRASS_LIGHT, RIGHT, WRONG]) for (const bg of [BG, SURFACE, RAISED]) check(fg, bg, 4.5)
+test('text reads at 4.5:1 on the page, the card, a picked answer and the xAPI panel', () => {
+  for (const fg of [PAPER, CREAM, MUTED, BRASS_LIGHT, RIGHT, WRONG]) for (const bg of [BG, SURFACE, RAISED, PANEL]) check(fg, bg, 4.5)
 })
 
 test('black on the brass buttons, normal and hovered', () => {
@@ -29,5 +29,5 @@ test('black on the brass buttons, normal and hovered', () => {
 })
 
 test('the edges of controls show at 3:1', () => {
-  for (const edge of [EDGE, BRASS, BRASS_LIGHT, RIGHT, WRONG]) for (const bg of [BG, SURFACE, RAISED]) check(edge, bg, 3)
+  for (const edge of [EDGE, BRASS, BRASS_LIGHT, RIGHT, WRONG]) for (const bg of [BG, SURFACE, RAISED, PANEL]) check(edge, bg, 3)
 })

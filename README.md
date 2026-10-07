@@ -9,6 +9,9 @@ Record Store (LRS) such as SCORM Cloud.
 - **Launch it from an LMS** the standard xAPI way, and it records to that LMS's own LRS.
 - **Or run it on its own:** learners give a name and email (or stay anonymous) and the server
   records the attempt in your LRS.
+- **See the xAPI as it's sent:** a panel along the bottom lists each statement in plain words (who
+  did what, the response, right or wrong, the score, the time), whether the LRS stored it, and its
+  JSON. It collapses to a bar; `?xapi-panel=0` hides it when embedding.
 - **WCAG 2.2 AA:** keyboard and screen reader friendly (focus moves to each question and its
   feedback; right and wrong are said in words, not just colour), colour contrast held by a test,
   everything in em and scaled to the space by a sizer, with an Auto-scale text switch. Checked
@@ -45,6 +48,7 @@ Verbs are ADL's (`http://adlnet.gov/expapi/verbs/…`). Activities are
 | Address | What it does |
 | --- | --- |
 | `/` or `/?quiz=midi-basics` | The quiz |
+| `/?xapi-panel=0` | The quiz without the live xAPI panel |
 | `/embed-demo.html` | The quiz embedded in a page, showing the messages it sends and the embed code |
 | `/?endpoint=<LRS>&auth=<Basic …>&actor=<JSON>&registration=<uuid>&activity_id=<IRI>` | An LMS launch |
 | `/api/health` | `{ ok, lrs: 'mock' \| 'configured' }` |
@@ -73,7 +77,7 @@ Verbs are ADL's (`http://adlnet.gov/expapi/verbs/…`). Activities are
 | `shared/xapi.js` | The xAPI statements for an attempt |
 | `shared/email.js` | Email rules for the page and the server |
 | `server/index.js` | Express: `api/statements` to the LRS, plus the built page |
-| `src/` | The React app: `App.jsx`, `components/`, `recorder.js` (server or LMS), `launch.js`, `embed.js`, `sizer.js` |
+| `src/` | The React app: `App.jsx`, `components/` (including `XapiPanel.jsx`), `recorder.js` (server or LMS, with the live log), `xapiText.js` (statements in words), `launch.js`, `embed.js`, `sizer.js` |
 | `public/embed-demo.html` | The embedding demo |
 | `deploy/` | systemd unit, nginx site and update script for a VPS |
 
@@ -88,7 +92,7 @@ A question is `{ id, type: 'choice', prompt, choices: [{ id, text }], answer, ex
    `NODE_ENV=production` the server won't start without them).
 3. `npm run dev` and open the address Vite prints.
 
-`npm test` runs the scoring, statement and colour-contrast tests. To try the production setup:
+`npm test` runs the scoring, statement, statement-in-words and colour-contrast tests. To try the production setup:
 `npm run build`, then `npm start`, and open `http://localhost:3030`.
 
 ## Deploying to a VPS

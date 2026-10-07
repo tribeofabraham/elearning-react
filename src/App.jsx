@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 import logo from './assets/LogoOnly.svg'
 import { scoreAttempt } from '../shared/quiz.js'
 import { reportHeight, tellHost } from './embed.js'
@@ -8,14 +8,16 @@ import { useSizer } from './sizer.js'
 import Question from './components/Question.jsx'
 import Results from './components/Results.jsx'
 import Start from './components/Start.jsx'
+import XapiPanel from './components/XapiPanel.jsx'
 
 // The quiz fills the space it's given (a full window, or an iframe on another page)
 const SIZER = { designWidth: 900, designHeight: 820, fitHeight: true, minScale: 0.8, maxScale: 1.8, reflowBelow: 36 }
 
 // One attempt goes: start → each question (answer, check, feedback) → results.
 export default function App() {
-  const { quiz, lms } = useMemo(() => readLaunch(), [])
+  const { quiz, lms, showPanel } = useMemo(() => readLaunch(), [])
   const recorder = useMemo(() => createRecorder({ quiz, lms }), [quiz, lms])
+  const log = useSyncExternalStore(recorder.subscribe, recorder.log)
 
   const [fluid, setFluid] = useState(true)
   const sizerRef = useRef(null)
@@ -75,7 +77,7 @@ export default function App() {
 
   return (
     <div className="sizer" ref={sizerRef}>
-      <div className="page" ref={pageRef} style={{ fontSize: `${scale}rem` }}>
+      <div className={showPanel ? 'page has-panel' : 'page'} ref={pageRef} style={{ fontSize: `${scale}rem` }}>
         <header className="top">
           {/* Decorative: the name beside it says who this is */}
           <img src={logo} alt="" className="brand-star" width="864" height="864" />
@@ -90,7 +92,6 @@ export default function App() {
           )}
           {screen === 'results' && (
             <Results quiz={quiz} responses={responses} finishState={finishState}
-                     statements={finishState === 'saving' ? null : recorder.sent()}
                      onRetrySave={() => finish()} onRestart={() => setScreen('start')} />
           )}
           {/* Polite: recording problems are worth knowing about, not worth interrupting for */}
@@ -105,6 +106,8 @@ export default function App() {
             Auto-scale text
           </button>
         </footer>
+
+        {showPanel && <XapiPanel log={log} mode={recorder.mode} />}
       </div>
     </div>
   )
