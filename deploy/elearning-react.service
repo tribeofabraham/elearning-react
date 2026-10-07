@@ -1,7 +1,5 @@
 # systemd unit: runs the e-learning server, starts it at boot and restarts it if it stops.
-#   sudo cp deploy/elearning-react.service /etc/systemd/system/
-#   sudo systemctl daemon-reload && sudo systemctl enable --now elearning-react
-#   journalctl -u elearning-react -f        (its log)
+# Installed by deploy/setup.sh. Its log: journalctl -u elearning-react -f
 [Unit]
 Description=Tribe of Abraham e-learning (xAPI quiz server)
 After=network-online.target
@@ -11,8 +9,11 @@ Wants=network-online.target
 Type=simple
 User=elearning
 Group=elearning
-WorkingDirectory=/srv/elearning-react
+WorkingDirectory=/srv/elearning/app
 Environment=NODE_ENV=production
+# Only Caddy, on this machine, talks to it; Caddy serves the world over HTTPS
+Environment=HOST=127.0.0.1
+Environment=PORT=3030
 # .env holds the LRS endpoint, key and secret (readable by the elearning user only)
 ExecStart=/usr/bin/node --env-file-if-exists=.env server/index.js
 Restart=on-failure

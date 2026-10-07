@@ -24,6 +24,8 @@ const {
   // Activities are recorded as <ACTIVITY_BASE>/<quiz id>
   ACTIVITY_BASE = 'https://tribeofabraham.com/xapi/elearning-react',
   PORT = 3030,
+  // On the VPS: 127.0.0.1, so only Caddy (in front) can reach it. Left unset in development.
+  HOST,
 } = process.env
 
 for (const quiz of Object.values(QUIZZES)) {
@@ -144,12 +146,14 @@ app.post('/api/statements', async (req, res) => {
 const distDir = fileURLToPath(new URL('../dist', import.meta.url))
 if (existsSync(distDir)) app.use(express.static(distDir))
 
-app.listen(PORT, (err) => {
+const onListening = (err) => {
   if (err) {
     console.error(err.code === 'EADDRINUSE' ? `Port ${PORT} is already in use. Is the server already running?` : err)
     process.exit(1)
   }
-  console.log(`E-learning server on http://localhost:${PORT}`)
+  console.log(`E-learning server on http://${HOST ?? 'localhost'}:${PORT}`)
   if (existsSync(distDir)) console.log(`Serving the built quiz from ${distDir}`)
   console.log(useMockLrs ? 'No LRS credentials: using the mock LRS (statements are printed here)' : `LRS: ${endpoint}`)
-})
+}
+if (HOST) app.listen(PORT, HOST, onListening)
+else app.listen(PORT, onListening)

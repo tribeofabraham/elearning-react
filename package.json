@@ -9,7 +9,9 @@
     "build": "vite build",
     "start": "node --env-file-if-exists=.env server/index.js",
     "test": "node --test \"shared/**/*.test.js\" \"src/**/*.test.js\"",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "bash deploy/deploy.sh",
+    "setup": "bash deploy/setup.sh"
   },
   "dependencies": {
     "express": "^5.2.1",

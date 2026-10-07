@@ -79,7 +79,7 @@ Verbs are ADL's (`http://adlnet.gov/expapi/verbs/…`). Activities are
 | `server/index.js` | Express: `api/statements` to the LRS, plus the built page |
 | `src/` | The React app: `App.jsx`, `components/` (including `XapiPanel.jsx`), `recorder.js` (server or LMS, with the live log), `xapiText.js` (statements in words), `launch.js`, `embed.js`, `sizer.js` |
 | `public/embed-demo.html` | The embedding demo |
-| `deploy/` | systemd unit, nginx site and update script for a VPS |
+| `deploy/` | Setup and deploy scripts for the VPS, and its systemd unit |
 
 A question is `{ id, type: 'choice', prompt, choices: [{ id, text }], answer, explanation }` or
 `{ id, type: 'true-false', prompt, answer: true|false, explanation }`. The tests check every quiz.
@@ -95,39 +95,32 @@ A question is `{ id, type: 'choice', prompt, choices: [{ id, text }], answer, ex
 `npm test` runs the scoring, statement, statement-in-words and colour-contrast tests. To try the production setup:
 `npm run build`, then `npm start`, and open `http://localhost:3030`.
 
-## Deploying to a VPS
+## Deploying
 
-Bluehost's shared hosting can't run Node, so the server runs on a VPS (Ubuntu 22.04 or 24.04 here)
-behind nginx, at a subdomain such as `learn.tribeofabraham.com`.
+It runs on the Ragamuffin Studios VPS (`50.6.206.202`, AlmaLinux 9), beside the Ragamuffin dashboard:
+Node.js runs the server on `127.0.0.1:3030` as a systemd service, and **Caddy** serves it over HTTPS
+at **https://learn.tribeofabraham.com** (with a certificate it gets and renews itself). Bluehost's
+shared hosting can't run Node, which is why it isn't on the main site's server.
 
 **Once:**
 
-```bash
-# Node 22, nginx, certbot
-curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
-sudo apt install -y nodejs nginx certbot python3-certbot-nginx git
+1. In Bluehost, add an **A record** for `learn` on tribeofabraham.com pointing to `50.6.206.202`.
+2. `npm run setup` (from Git Bash, with the SSH key that logs in as root): installs Node 22, the
+   `elearning` user and the service, and, once the A record works, adds the HTTPS site to Caddy.
+   Run it again after adding the record if it was too early.
 
-# A user to run it, and the code
-sudo useradd --system --create-home --home-dir /srv/elearning-react --shell /usr/sbin/nologin elearning
-sudo -u elearning git clone https://github.com/tribeofabraham/elearning-react.git /srv/elearning-react
-cd /srv/elearning-react
-sudo -u elearning cp .env.example .env && sudo -u elearning nano .env    # the LRS details
-sudo chmod 600 .env
-sudo -u elearning npm ci --include=dev && sudo -u elearning npm run build
+**Each time** (after committing and pushing): `npm run deploy`. It refuses unless this copy matches
+GitHub, runs the tests, builds the page, sends it all up, installs the server's packages, restarts
+the service and checks it answers. The first deploy copies your `.env` (the LRS details) to the
+server; after that the server's own copy is kept.
 
-# Keep it running, and put it on the web
-sudo cp deploy/elearning-react.service /etc/systemd/system/
-sudo systemctl daemon-reload && sudo systemctl enable --now elearning-react
-sudo cp deploy/nginx.conf /etc/nginx/sites-available/elearning-react     # set server_name first
-sudo ln -s /etc/nginx/sites-available/elearning-react /etc/nginx/sites-enabled/
-sudo nginx -t && sudo systemctl reload nginx
-```
+| | |
+| --- | --- |
+| `deploy/setup.sh` | One-time server setup (safe to rerun) |
+| `deploy/deploy.sh` | Each deploy |
+| `deploy/elearning-react.service` | The systemd unit (`journalctl -u elearning-react -f` for its log) |
 
-Then in Bluehost's **Zone Editor**, add an `A` record for `learn` pointing to the VPS's IP address,
-and once it resolves: `sudo certbot --nginx -d learn.tribeofabraham.com`.
-
-**Each update** (after pushing to GitHub): on the VPS, run `/srv/elearning-react/deploy/update.sh` as
-your admin user. It pulls, installs, tests, builds and restarts the server, then checks it's answering.
+Another server or address: `ELEARNING_SERVER=root@<ip> ELEARNING_DOMAIN=<name> npm run deploy`.
 
 ## License
 
