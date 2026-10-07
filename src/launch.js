@@ -7,7 +7,8 @@
 //
 //   &learner_name=Ada%20Lovelace&learner_email=ada@example.com     or  &learner_id=<their LMS id>
 //
-// Then the quiz doesn't ask who's taking it, and records them through this app's server.
+// Then the quiz doesn't ask who's taking it, and records them through this app's server. A host page
+// can send the same in a message instead, which keeps it out of the address (embed.js).
 //
 // An LMS or LRS that launches the quiz the standard xAPI way ("Tin Can launch") adds its own LRS and
 // learner, and the page then sends statements there itself:
@@ -51,14 +52,21 @@ export function readLaunch(search = window.location.search) {
   return { quiz, lms, learner: lms ? null : readLearner(params), showViewer: params.get('xapi-panel') !== '0' }
 }
 
-// The learner given in the address, if any: { name, email } or { name, accountId }. A bad email or
-// id is ignored (the quiz then asks), so a typo in a course can't record someone as the wrong person.
-function readLearner(params) {
-  const name = (params.get('learner_name') ?? '').trim().slice(0, 100)
-  const email = normalizeEmail(params.get('learner_email'))
-  const id = (params.get('learner_id') ?? '').trim()
-  if (email && !emailError(email)) return { name, email }
-  if (id && ACCOUNT_ID.test(id)) return { name, accountId: id }
+// The learner given in the address, if any.
+const readLearner = (params) => learnerFrom({
+  name: params.get('learner_name'), email: params.get('learner_email'), id: params.get('learner_id'),
+})
+
+// A learner from what a host page gave (in the address, or in a message: embed.js), as
+// { name, email } or { name, accountId }, or null. An id that's an email address counts as one.
+// A bad email or id is ignored (the quiz then asks), so a host can't record someone as the wrong
+// person by mistake.
+export function learnerFrom({ name, email, id } = {}) {
+  const cleanName = typeof name === 'string' ? name.trim().slice(0, 100) : ''
+  const cleanId = typeof id === 'string' ? id.trim() : ''
+  const asEmail = normalizeEmail(email || (cleanId.includes('@') ? cleanId : ''))
+  if (asEmail && !emailError(asEmail)) return { name: cleanName, email: asEmail }
+  if (cleanId && ACCOUNT_ID.test(cleanId)) return { name: cleanName, accountId: cleanId }
   return null
 }
 

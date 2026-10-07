@@ -5,7 +5,8 @@
  *   <script src="https://learn.tribeofabraham.com/lectora.js"></script>
  *
  * 1. Tells the quiz who the learner is, from Lectora's AICC_Student_Name and AICC_Student_ID, so it
- *    doesn't ask.
+ *    doesn't ask. By message ({ source: 'elearning-host', type: 'learner', name, id }), answering
+ *    the quiz's 'ready', so the learner stays out of addresses and server logs.
  * 2. When the quiz is finished, puts the score into the course's SCORM record:
  *    - in Lectora, through its own variables (AICC_Score as a percentage, AICC_Lesson_Status passed
  *      or failed), so Lectora reports them to the LMS itself;
@@ -56,26 +57,22 @@
     return null
   }
 
-  // -- 1. The learner, into each quiz frame's address --
-  function passLearner() {
+  // -- 1. The learner, by message (kept out of addresses and server logs) --
+  // The quiz says 'ready' when it can take it; it's also sent straight away, in case it was ready first.
+  function sendLearner() {
     var name = value('AICC_Student_Name')
     var id = value('AICC_Student_ID')
     if (!name && !id) return
     var frames = document.querySelectorAll('iframe')
     for (var i = 0; i < frames.length; i++) {
       var f = frames[i]
-      if (!f.src || f.src.indexOf(QUIZ) !== 0) continue
-      var url = new URL(f.src)
-      if (url.searchParams.has('learner_name') || url.searchParams.has('learner_id') || url.searchParams.has('learner_email')) continue
-      if (name) url.searchParams.set('learner_name', name)
-      // An id that's an email address is recorded as one
-      if (id) url.searchParams.set(/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(id) ? 'learner_email' : 'learner_id', id)
-      log('learner', name, id)
-      f.src = url.toString()
+      if (!f.src || f.src.indexOf(QUIZ) !== 0 || !f.contentWindow) continue
+      f.contentWindow.postMessage({ source: 'elearning-host', type: 'learner', name: name, id: id }, QUIZ)
+      log('learner sent', name, id)
     }
   }
-  if (document.readyState === 'complete') passLearner()
-  else window.addEventListener('load', passLearner)
+  if (document.readyState === 'complete') sendLearner()
+  else window.addEventListener('load', sendLearner)
 
   // -- 2. The score, into SCORM --
   function report(score, passed) {
@@ -125,6 +122,7 @@
   window.addEventListener('message', function (e) {
     if (e.origin !== QUIZ) return
     var d = e.data
+    if (d && d.source === 'elearning-react' && d.type === 'ready') return sendLearner()
     if (!d || d.source !== 'elearning-react' || d.type !== 'finished' || !d.score) return
     try {
       var how = report(d.score, !!d.passed)

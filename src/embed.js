@@ -1,13 +1,19 @@
-// When the quiz sits in an iframe on someone else's page, it tells that page what's happening, so the
-// page can react to a score or size the frame to fit. Messages look like:
+// When the quiz sits in an iframe on someone else's page, it talks with that page.
 //
-//   { source: 'elearning-react', type: 'resize',   height }                    whenever the height changes
+// To the page (window.parent.postMessage; nothing private, so any page may embed it: '*'):
+//
+//   { source: 'elearning-react', type: 'ready' }                               it can take the learner now
+//   { source: 'elearning-react', type: 'resize',   height }                    its full height, as it changes
 //   { source: 'elearning-react', type: 'started',  quizId }
 //   { source: 'elearning-react', type: 'answered', quizId, questionId, correct }
 //   { source: 'elearning-react', type: 'finished', quizId, score: { raw, max, scaled }, passed }
 //
-// The embedding page listens with window.addEventListener('message', ...). Nothing private is sent,
-// so any page may embed it ('*').
+// From the page (only from the page embedding it), before the quiz is started:
+//
+//   { source: 'elearning-host', type: 'learner', name, id }     (or email in place of id)
+//
+// Then the quiz doesn't ask who's taking it. Sent as a message, the learner stays out of addresses
+// and server logs. The page can send it on 'ready' and/or straight away; either order works.
 
 const embedded = window.parent !== window
 
@@ -15,13 +21,30 @@ export function tellHost(type, data = {}) {
   if (embedded) window.parent.postMessage({ source: 'elearning-react', type, ...data }, '*')
 }
 
-export function reportHeight(element) {
+// The quiz's full height, though its content scrolls inside a fixed frame: the page around the
+// scrolling area plus everything in it. content: the element holding the screens.
+export function reportHeight(page, scroller, content) {
   if (!embedded || typeof ResizeObserver === 'undefined') return () => {}
   let last = 0
-  const observer = new ResizeObserver(() => {
-    const height = Math.ceil(element.scrollHeight)
+  const measure = () => {
+    const height = Math.ceil(page.offsetHeight - scroller.clientHeight + scroller.scrollHeight)
     if (height !== last) tellHost('resize', { height: (last = height) })
-  })
-  observer.observe(element)
+  }
+  const observer = new ResizeObserver(measure)
+  for (const el of [page, scroller, content]) observer.observe(el)
   return () => observer.disconnect()
+}
+
+// Hears the learner from the page embedding it, then says it's ready for it. onLearner gets
+// { name, id, email } as sent.
+export function listenForLearner(onLearner) {
+  if (!embedded) return () => {}
+  const listen = (e) => {
+    const d = e.data
+    if (e.source !== window.parent || !d || d.source !== 'elearning-host' || d.type !== 'learner') return
+    onLearner({ name: d.name, id: d.id, email: d.email })
+  }
+  window.addEventListener('message', listen)
+  tellHost('ready')
+  return () => window.removeEventListener('message', listen)
 }

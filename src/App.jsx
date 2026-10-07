@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 import logo from './assets/LogoOnly.svg'
 import { scoreAttempt } from '../shared/quiz.js'
-import { reportHeight, tellHost } from './embed.js'
-import { readLaunch } from './launch.js'
+import { listenForLearner, reportHeight, tellHost } from './embed.js'
+import { learnerFrom, readLaunch } from './launch.js'
 import { createRecorder } from './recorder.js'
 import { useSizer } from './sizer.js'
 import Question from './components/Question.jsx'
@@ -27,7 +27,7 @@ function useLandscape() {
 
 // One attempt goes: start → each question (answer, check, feedback) → results.
 export default function App() {
-  const { quiz, lms, learner, showViewer } = useMemo(() => readLaunch(), [])
+  const { quiz, lms, learner: givenLearner, showViewer } = useMemo(() => readLaunch(), [])
   const recorder = useMemo(() => createRecorder({ quiz, lms }), [quiz, lms])
   const log = useSyncExternalStore(recorder.subscribe, recorder.log)
 
@@ -36,7 +36,9 @@ export default function App() {
   const landscape = useLandscape()
   const scale = useSizer(sizerRef, { ...(landscape ? LANDSCAPE_SIZER : SIZER), enabled: fluid })
   const pageRef = useRef(null)
-  useEffect(() => reportHeight(pageRef.current), [])
+  const mainRef = useRef(null)
+  const contentRef = useRef(null)
+  useEffect(() => reportHeight(pageRef.current, mainRef.current, contentRef.current), [])
 
   const [screen, setScreen] = useState('start')   // 'start' | 'question' | 'results'
   const [index, setIndex] = useState(0)
@@ -45,14 +47,27 @@ export default function App() {
   const [finishState, setFinishState] = useState('idle')   // 'idle' | 'saving' | 'saved' | 'failed'
   const timing = useRef({ attempt: 0, question: 0 })
 
+  // The learner, if the address or the page embedding the quiz says who it is (until the quiz starts;
+  // an LMS launch has its own)
+  const [learner, setLearner] = useState(givenLearner)
+  const started = useRef(false)
+  useEffect(() => {
+    if (lms) return undefined
+    return listenForLearner((sent) => {
+      const found = learnerFrom(sent)
+      if (found && !started.current) setLearner(found)
+    })
+  }, [lms])
+
   // Recording happens alongside the quiz: a failure is reported, never in the learner's way
   const record = (event) => recorder.record(event).catch((err) => {
     setRecordError(err.message)
     throw err
   })
 
-  function start(learner) {
-    recorder.begin(learner)
+  function start(who) {
+    started.current = true
+    recorder.begin(who)
     setResponses({})
     setIndex(0)
     setRecordError('')
@@ -97,20 +112,24 @@ export default function App() {
           <p className="brand"><span className="brand-name">Tribe of Abraham</span> <span className="app-name">E-Learning</span></p>
         </header>
 
-        <main className="main">
-          {screen === 'start' && <Start quiz={quiz} lms={lms} learner={learner} onStart={start} />}
-          {screen === 'question' && (
-            <Question key={quiz.questions[index].id} quiz={quiz} index={index}
-                      onAnswer={answer} onNext={next} />
-          )}
-          {screen === 'results' && (
-            <Results quiz={quiz} responses={responses} finishState={finishState}
-                     onRetrySave={() => finish()} onRestart={() => setScreen('start')} />
-          )}
-          {/* Polite: recording problems are worth knowing about, not worth interrupting for */}
-          <p className="record-error" role="status">
-            {recordError && screen === 'question' ? `Your answers aren't being recorded right now: ${recordError}` : ''}
-          </p>
+        {/* The quiz scrolls here, between a fixed top and bottom, so it works in a frame of any size,
+            even one that can't scroll itself (a course's web window) */}
+        <main className="main" ref={mainRef}>
+          <div className="main-content" ref={contentRef}>
+            {screen === 'start' && <Start quiz={quiz} lms={lms} learner={learner} onStart={start} />}
+            {screen === 'question' && (
+              <Question key={quiz.questions[index].id} quiz={quiz} index={index}
+                        onAnswer={answer} onNext={next} />
+            )}
+            {screen === 'results' && (
+              <Results quiz={quiz} responses={responses} finishState={finishState}
+                       onRetrySave={() => finish()} onRestart={() => setScreen('start')} />
+            )}
+            {/* Polite: recording problems are worth knowing about, not worth interrupting for */}
+            <p className="record-error" role="status">
+              {recordError && screen === 'question' ? `Your answers aren't being recorded right now: ${recordError}` : ''}
+            </p>
+          </div>
         </main>
 
         <footer className="foot">

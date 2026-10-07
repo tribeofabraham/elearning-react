@@ -35,8 +35,10 @@ a { color: var(--brass-light); }
 }
 
 /* Everything is in em: sizer.js sets .page's font size from the room there is */
-.sizer { min-height: 100%; }
-.page { min-height: 100%; display: flex; flex-direction: column; max-width: 52em; margin: 0 auto; padding: 1em 1.4em; }
+.sizer { height: 100%; }
+/* The page is exactly the window (or frame); the quiz scrolls inside .main, between the top and the
+   footer, so a frame that can't scroll (scrolling="no") still shows all of it */
+.page { height: 100%; display: flex; flex-direction: column; max-width: 52em; margin: 0 auto; padding: 1em 1.4em; }
 
 /* The top, as the other Tribe of Abraham tools: the star, the name, and the app's in a light face */
 .top { display: flex; align-items: center; gap: 0.6em; margin-bottom: 1.2em; }
@@ -45,7 +47,7 @@ a { color: var(--brass-light); }
 .brand-name { font-family: var(--display); font-size: 1.15em; letter-spacing: 0.02em; text-transform: uppercase; color: #fff; }
 .app-name { font-family: var(--light); font-weight: 300; font-size: 1.22em; letter-spacing: 0.06em; text-transform: uppercase; color: #fff; }
 
-.main { flex: 1; }
+.main { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 0.2em; margin: -0.2em; }
 .card { background: var(--surface); border: 0.06em solid var(--line); border-radius: 0.6em; padding: 1.8em 2em 2em; }
 .eyebrow { font-size: 0.75em; letter-spacing: 0.22em; text-transform: uppercase; color: var(--brass-light); margin-bottom: 0.4em; }
 /* Lining figures: the face's old-style ones make "10" read as "1o" */
