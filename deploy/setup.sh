@@ -28,7 +28,9 @@ if ! node --version 2>/dev/null | grep -q '^v22\.'; then
   dnf -y -q module enable nodejs:22 >/dev/null
   dnf -y -q install nodejs >/dev/null
 fi
-echo "  ✔ Node $(node --version)"
+# On AlmaLinux npm is its own package
+command -v npm >/dev/null || dnf -y -q install npm >/dev/null
+echo "  ✔ Node $(node --version), npm $(npm --version)"
 if ! id elearning >/dev/null 2>&1; then
   useradd --system --home-dir /srv/elearning --shell /sbin/nologin elearning
 fi
