@@ -113,12 +113,15 @@ export function statementsFor(attempt, event, { newId, now }) {
   throw new Error(`Unknown event type: ${event.type}`)
 }
 
-// An actor from what a learner typed: their email if they gave one, else an anonymous account.
-// homePage: the site that vouches for anonymous ids.
-export function learnerActor({ name, email, anonymousId }, homePage) {
+// An actor for a learner: their email if there is one; else an account, named by the id their LMS
+// gave (accountId) or an anonymous id. homePage: the site that vouches for those ids.
+export function learnerActor({ name, email, accountId, anonymousId }, homePage) {
   const actor = { objectType: 'Agent' }
   if (name) actor.name = name
   if (email) actor.mbox = `mailto:${email}`
-  else actor.account = { homePage, name: anonymousId }
+  else actor.account = { homePage, name: accountId ?? anonymousId }
   return actor
 }
+
+// An LMS's learner id: letters, digits and . _ @ : + - only, so it's safe in an IRI and a log.
+export const ACCOUNT_ID = /^[\w.@:+-]{1,100}$/

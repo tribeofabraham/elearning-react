@@ -15,7 +15,7 @@ import { fileURLToPath } from 'node:url'
 import { emailError, normalizeEmail } from '../shared/email.js'
 import { isValidResponse, quizProblems, scoreAttempt } from '../shared/quiz.js'
 import { QUIZZES } from '../shared/quizzes/index.js'
-import { XAPI_VERSION, learnerActor, statementsFor } from '../shared/xapi.js'
+import { ACCOUNT_ID, XAPI_VERSION, learnerActor, statementsFor } from '../shared/xapi.js'
 
 const {
   LRS_ENDPOINT,
@@ -76,6 +76,11 @@ function readLearner(learner) {
     const error = emailError(email)
     if (error) throw new BadRequest(error)
     return { name, email }
+  }
+  // An id from the learner's LMS (e.g. passed in by a Lectora course)
+  if (learner?.accountId !== undefined) {
+    if (!ACCOUNT_ID.test(learner.accountId)) throw new BadRequest('That learner id has characters it may not.')
+    return { name, accountId: learner.accountId }
   }
   if (!UUID.test(learner?.anonymousId ?? '')) throw new BadRequest('An email address or an anonymous id is needed.')
   return { name, anonymousId: learner.anonymousId.toLowerCase() }

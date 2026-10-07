@@ -4,7 +4,7 @@
   --bg: #000000;
   --surface: #15110b;      /* the card: a warm near-black */
   --raised: #221b11;       /* an answer you've picked */
-  --panel: #0b0905;        /* the xAPI panel */
+  --panel: #0b0905;        /* the xAPI viewer */
   --line: #3a3020;         /* decorative rules */
   --edge: #8c7a55;         /* the edges of controls */
   --paper: #f4efe6;
@@ -23,8 +23,6 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body, #root { height: 100%; }
-/* Whatever gets focus or is scrolled to stays clear of the xAPI panel along the bottom */
-html { scroll-padding-bottom: calc(var(--panel-height, 0px) + 1rem); }
 body { background: var(--bg); color: var(--cream); font-family: var(--sans); line-height: 1.55; }
 button, input { font: inherit; color: inherit; }
 button { cursor: pointer; }
@@ -39,8 +37,6 @@ a { color: var(--brass-light); }
 /* Everything is in em: sizer.js sets .page's font size from the room there is */
 .sizer { min-height: 100%; }
 .page { min-height: 100%; display: flex; flex-direction: column; max-width: 52em; margin: 0 auto; padding: 1em 1.4em; }
-/* Room at the bottom for the xAPI panel, which reports its own height */
-.page.has-panel { padding-bottom: calc(var(--panel-height, 3.5em) + 1em); }
 
 /* The top, as the other Tribe of Abraham tools: the star, the name, and the app's in a light face */
 .top { display: flex; align-items: center; gap: 0.6em; margin-bottom: 1.2em; }
@@ -136,27 +132,39 @@ fieldset:disabled .choice.chosen:hover { background: var(--raised); }
 .review li.is-wrong .review-mark { color: var(--wrong); font-weight: 500; }
 .actions { margin-bottom: 1.6em; }
 
-/* The xAPI panel: along the bottom, each statement in words as it's sent */
-.xapi-panel {
-  position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; font-size: 0.85em;
-  background: var(--panel); border-top: 0.12em solid var(--brass); box-shadow: 0 -0.4em 1.4em rgba(0, 0, 0, 0.7);
+/* The xAPI viewer: a quiet button in the footer, and the dialog it opens */
+.foot-tools { display: flex; align-items: center; gap: 0.8em; }
+.xapi-open {
+  display: inline-flex; align-items: center; gap: 0.4em; min-height: 2em;
+  background: transparent; border: 0.08em solid transparent; border-radius: 0.35em; padding: 0.2em 0.5em;
+  color: var(--muted); font-size: 0.9em;
 }
-.xapi-bar, .xapi-list { max-width: 61em; margin: 0 auto; padding-left: 1.6em; padding-right: 1.6em; }
-.xapi-bar { display: flex; align-items: center; gap: 0.5em 1em; padding-top: 0.55em; padding-bottom: 0.55em; }
-.xapi-bar h2 { font-family: var(--display); font-size: 1.15em; letter-spacing: 0.1em; color: var(--brass-light); line-height: 1; }
-.xapi-summary { flex: 1; color: var(--muted); }
-.xapi-route { color: var(--muted); }
-.xapi-toggle {
+.xapi-open:hover { border-color: var(--edge); color: var(--cream); }
+.xapi-braces { font-family: Consolas, monospace; }
+.xapi-count {
+  font-size: 0.8em; font-variant-numeric: tabular-nums; min-width: 1.6em; text-align: center;
+  border: 0.08em solid var(--edge); border-radius: 1em; padding: 0 0.4em;
+}
+.xapi-dialog {
+  width: min(46em, 94vw); max-height: 84vh; margin: auto; padding: 1.2em 1.4em 1em;
+  background: var(--panel); color: var(--cream); border: 0.1em solid var(--brass); border-radius: 0.6em;
+  font-size: 0.9em; display: none; flex-direction: column;
+}
+.xapi-dialog[open] { display: flex; }
+.xapi-dialog::backdrop { background: rgba(0, 0, 0, 0.75); }
+.xapi-head-bar { display: flex; align-items: center; justify-content: space-between; gap: 1em; }
+.xapi-head-bar h2 { font-size: 1.4em; }
+.xapi-close {
   background: transparent; border: 0.08em solid var(--edge); border-radius: 0.35em; padding: 0.25em 0.9em; color: var(--brass-light);
 }
-.xapi-toggle:hover { background: var(--raised); }
-.xapi-list { max-height: 28vh; overflow-y: auto; padding-bottom: 0.9em; }
-.xapi-list ol { list-style: none; display: grid; gap: 0.6em; }
+.xapi-close:hover { background: var(--raised); }
+.xapi-summary { color: var(--muted); margin: 0.3em 0 0.8em; }
+.xapi-list { overflow-y: auto; min-height: 6em; padding-right: 0.3em; }
 .xapi-empty { color: var(--muted); padding-bottom: 0.3em; }
 .xapi-entry { border-left: 0.2em solid var(--edge); padding: 0.3em 0 0.3em 0.8em; }
 .xapi-entry.is-stored { border-color: var(--right); }
 .xapi-entry.is-failed { border-color: var(--wrong); }
-.xapi-head { display: flex; flex-wrap: wrap; gap: 0 0.8em; font-size: 0.9em; }
+.xapi-meta { display: flex; flex-wrap: wrap; gap: 0 0.8em; font-size: 0.9em; }
 .xapi-time { color: var(--muted); font-variant-numeric: tabular-nums; }
 .xapi-status { font-weight: 500; }
 .xapi-status.is-sending { color: var(--muted); }
@@ -213,8 +221,6 @@ fieldset:disabled .choice.chosen:hover { background: var(--raised); }
 /* Phones */
 @media (max-width: 36em) {
   .page { padding: 0.8em; }
-  .xapi-bar, .xapi-list { padding-left: 0.9em; padding-right: 0.9em; }
-  .xapi-route { display: none; }
   .card { padding: 1.2em; }
   h1, .question h1 { font-size: 1.5em; }
 }

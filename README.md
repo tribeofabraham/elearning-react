@@ -9,9 +9,11 @@ Record Store (LRS) such as SCORM Cloud.
 - **Launch it from an LMS** the standard xAPI way, and it records to that LMS's own LRS.
 - **Or run it on its own:** learners give a name and email (or stay anonymous) and the server
   records the attempt in your LRS.
-- **See the xAPI as it's sent:** a panel along the bottom lists each statement in plain words (who
-  did what, the response, right or wrong, the score, the time), whether the LRS stored it, and its
-  JSON. It collapses to a bar; `?xapi-panel=0` hides it when embedding.
+- **See the xAPI as it's sent:** a small "{ } xAPI" button in the footer (an easter egg for demos)
+  opens a dialog listing each statement in plain words (who did what, the response, right or wrong,
+  the score, the time), whether the LRS stored it, and its JSON. `?xapi-panel=0` hides the button.
+- **In Lectora:** in a Web Window, with the learner passed in and the score passed back. See
+  [docs/LECTORA.md](docs/LECTORA.md).
 - **WCAG 2.2 AA:** keyboard and screen reader friendly (focus moves to each question and its
   feedback; right and wrong are said in words, not just colour), colour contrast held by a test,
   everything in em and scaled to the space by a sizer, with an Auto-scale text switch. Checked
@@ -48,7 +50,8 @@ Verbs are ADL's (`http://adlnet.gov/expapi/verbs/…`). Activities are
 | Address | What it does |
 | --- | --- |
 | `/` or `/?quiz=midi-basics` | The quiz |
-| `/?xapi-panel=0` | The quiz without the live xAPI panel |
+| `/?xapi-panel=0` | The quiz without the "{ } xAPI" button |
+| `/?learner_name=…&learner_email=…` or `&learner_id=…` | The learner, from the page embedding it: skips "Who is taking the quiz?" |
 | `/embed-demo.html` | The quiz embedded in a page, showing the messages it sends and the embed code |
 | `/?endpoint=<LRS>&auth=<Basic …>&actor=<JSON>&registration=<uuid>&activity_id=<IRI>` | An LMS launch |
 | `/api/health` | `{ ok, lrs: 'mock' \| 'configured' }` |
@@ -77,7 +80,7 @@ Verbs are ADL's (`http://adlnet.gov/expapi/verbs/…`). Activities are
 | `shared/xapi.js` | The xAPI statements for an attempt |
 | `shared/email.js` | Email rules for the page and the server |
 | `server/index.js` | Express: `api/statements` to the LRS, plus the built page |
-| `src/` | The React app: `App.jsx`, `components/` (including `XapiPanel.jsx`), `recorder.js` (server or LMS, with the live log), `xapiText.js` (statements in words), `launch.js`, `embed.js`, `sizer.js` |
+| `src/` | The React app: `App.jsx`, `components/` (including `XapiViewer.jsx`), `recorder.js` (server or LMS, with the live log), `xapiText.js` (statements in words), `launch.js`, `embed.js`, `sizer.js` |
 | `public/embed-demo.html` | The embedding demo |
 | `deploy/` | Setup and deploy scripts for the VPS, and its systemd unit |
 

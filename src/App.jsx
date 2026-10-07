@@ -8,14 +8,14 @@ import { useSizer } from './sizer.js'
 import Question from './components/Question.jsx'
 import Results from './components/Results.jsx'
 import Start from './components/Start.jsx'
-import XapiPanel from './components/XapiPanel.jsx'
+import XapiViewer from './components/XapiViewer.jsx'
 
 // The quiz fills the space it's given (a full window, or an iframe on another page)
 const SIZER = { designWidth: 900, designHeight: 820, fitHeight: true, minScale: 0.8, maxScale: 1.8, reflowBelow: 36 }
 
 // One attempt goes: start → each question (answer, check, feedback) → results.
 export default function App() {
-  const { quiz, lms, showPanel } = useMemo(() => readLaunch(), [])
+  const { quiz, lms, learner, showViewer } = useMemo(() => readLaunch(), [])
   const recorder = useMemo(() => createRecorder({ quiz, lms }), [quiz, lms])
   const log = useSyncExternalStore(recorder.subscribe, recorder.log)
 
@@ -77,7 +77,7 @@ export default function App() {
 
   return (
     <div className="sizer" ref={sizerRef}>
-      <div className={showPanel ? 'page has-panel' : 'page'} ref={pageRef} style={{ fontSize: `${scale}rem` }}>
+      <div className="page" ref={pageRef} style={{ fontSize: `${scale}rem` }}>
         <header className="top">
           {/* Decorative: the name beside it says who this is */}
           <img src={logo} alt="" className="brand-star" width="864" height="864" />
@@ -85,7 +85,7 @@ export default function App() {
         </header>
 
         <main className="main">
-          {screen === 'start' && <Start quiz={quiz} lms={lms} onStart={start} />}
+          {screen === 'start' && <Start quiz={quiz} lms={lms} learner={learner} onStart={start} />}
           {screen === 'question' && (
             <Question key={quiz.questions[index].id} quiz={quiz} index={index}
                       onAnswer={answer} onNext={next} />
@@ -102,6 +102,8 @@ export default function App() {
 
         <footer className="foot">
           <p>© {new Date().getFullYear()} <a href="https://tribeofabraham.com">Tribe of Abraham</a> · xAPI e-learning</p>
+          <div className="foot-tools">
+            {showViewer && <XapiViewer log={log} mode={recorder.mode} />}
           {/* A switch: its name stays "Auto-scale text" and it reports on / off itself, so the
               visible On / Off is for the eye only (screen readers would otherwise hear it twice) */}
           <button type="button" role="switch" aria-checked={fluid} className="scale-switch" onClick={() => setFluid(!fluid)}>
@@ -109,9 +111,8 @@ export default function App() {
             <span className="switch-track" aria-hidden="true"><span className="switch-knob" /></span>
             <span className="switch-state" aria-hidden="true">{fluid ? 'On' : 'Off'}</span>
           </button>
+          </div>
         </footer>
-
-        {showPanel && <XapiPanel log={log} mode={recorder.mode} />}
       </div>
     </div>
   )

@@ -66,4 +66,6 @@ test('learners: by email, or as an anonymous account', () => {
     { objectType: 'Agent', name: 'Ada', mbox: 'mailto:ada@example.com' })
   assert.deepEqual(learnerActor({ anonymousId: 'abc' }, 'https://x'),
     { objectType: 'Agent', account: { homePage: 'https://x', name: 'abc' } })
+  assert.deepEqual(learnerActor({ name: 'Ada', accountId: 'jsmith42' }, 'https://x'),
+    { objectType: 'Agent', name: 'Ada', account: { homePage: 'https://x', name: 'jsmith42' } })
 })

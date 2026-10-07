@@ -3,9 +3,10 @@ import { MAX_EMAIL_LENGTH, emailError, normalizeEmail } from '../../shared/email
 import { actorLabel } from '../launch.js'
 import { anonymousId } from '../recorder.js'
 
-// The quiz's title and what to expect, and who the attempt is recorded as. Launched from an LMS, that's
-// the LMS's learner; otherwise the learner may give a name and email, or go on anonymously.
-export default function Start({ quiz, lms, onStart }) {
+// The quiz's title and what to expect, and who the attempt is recorded as: the LMS's learner when an
+// LMS launched it, the learner the embedding page passed in (a Lectora course, say), or else whoever
+// the learner says they are (a name and email, or anonymous).
+export default function Start({ quiz, lms, learner, onStart }) {
   const emailRef = useRef(null)
   const [emailProblem, setEmailProblem] = useState('')
   const count = quiz.questions.length
@@ -14,6 +15,7 @@ export default function Start({ quiz, lms, onStart }) {
   function submit(e) {
     e.preventDefault()
     if (lms) return onStart(null)
+    if (learner) return onStart(learner)
     const form = new FormData(e.currentTarget)
     const name = String(form.get('name') ?? '').trim()
     const email = normalizeEmail(form.get('email'))
@@ -41,8 +43,10 @@ export default function Start({ quiz, lms, onStart }) {
       </ul>
 
       <form onSubmit={submit} noValidate>
-        {lms ? (
-          <p className="who">Your results go to your learning system as <strong>{actorLabel(lms.actor)}</strong>.</p>
+        {lms || learner ? (
+          <p className="who">
+            Your results are recorded as <strong>{lms ? actorLabel(lms.actor) : learner.name || learner.email || learner.accountId}</strong>.
+          </p>
         ) : (
           <fieldset className="learner">
             <legend>Who is taking the quiz? <span className="optional">(optional)</span></legend>
