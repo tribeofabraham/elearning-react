@@ -19,7 +19,8 @@ Record Store (LRS) such as SCORM Cloud.
 
 - **WCAG 2.2 AA:** keyboard and screen reader friendly (focus moves to each question and its
   feedback; right and wrong are said in words, not just colour), colour contrast held by a test,
-  everything in em and scaled to the space by a sizer, with an Auto-scale text switch. Checked
+  everything in em and scaled to the space by a sizer, with an Auto-scale text switch, and a
+  two-column landscape layout for wide, short frames like a Lectora Web Window or a phone on its side. Checked
   with axe: no violations.
 
 ## How an attempt is recorded

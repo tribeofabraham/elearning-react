@@ -16,10 +16,13 @@ Add a Web Window to the page and set its address to:
 https://learn.tribeofabraham.com/?quiz=midi-basics&xapi-panel=0
 ```
 
-- Give it room: **about 900 × 700 or more**, and **turn scrolling on** in the Web Window's
-  properties. The quiz needs about 700 pixels of height; in a shorter window with scrolling off
-  (Lectora's default is "no"), the feedback, Next button and results end up below the frame where a
-  mouse can't reach them. The quiz scales to fit, and scrolls on the results page.
+- **Size:** a wide, short window (about 3:2 or wider, and under 600 pixels tall) gets the quiz's
+  landscape layout: two columns under a slim top bar, made to fit without scrolling. It's tested at
+  820 × 434 (a typical Lectora page area) and fits there with nothing cut off; on the results page
+  the list of answers scrolls in its own box. Keep it **at least about 800 × 420**.
+- A taller, narrower window gets the ordinary layout, which needs about 700 pixels of height: turn
+  **scrolling on** in the Web Window's properties for that, or the feedback, Next button and results
+  end up below the frame where a mouse can't reach them.
 - `xapi-panel=0` hides the small "{ } xAPI" button in the quiz's footer, which is there for demos.
   Leave it off to show the statements as they're sent.
 - The quiz asks who's taking it (a name and email, or anonymous), unless step 2 passes that in.

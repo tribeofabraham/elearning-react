@@ -33,16 +33,18 @@ export default function Start({ quiz, lms, learner, onStart }) {
 
   return (
     <section className="card start" aria-labelledby="quiz-title">
-      <p className="eyebrow">Quiz</p>
-      <h1 id="quiz-title">{quiz.title}</h1>
-      <p className="lede">{quiz.description}</p>
-      <ul className="facts">
-        <li><strong>{count}</strong> questions</li>
-        <li><strong>{passMark}%</strong> to pass</li>
-        <li>Feedback after each answer</li>
-      </ul>
+      <div className="start-intro">
+        <p className="eyebrow">Quiz</p>
+        <h1 id="quiz-title">{quiz.title}</h1>
+        <p className="lede">{quiz.description}</p>
+        <ul className="facts">
+          <li><strong>{count}</strong> questions</li>
+          <li><strong>{passMark}%</strong> to pass</li>
+          <li>Feedback after each answer</li>
+        </ul>
+      </div>
 
-      <form onSubmit={submit} noValidate>
+      <form className="start-form" onSubmit={submit} noValidate>
         {lms || learner ? (
           <p className="who">
             Your results are recorded as <strong>{lms ? actorLabel(lms.actor) : learner.name || learner.email || learner.accountId}</strong>.

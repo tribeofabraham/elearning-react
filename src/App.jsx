@@ -10,8 +10,20 @@ import Results from './components/Results.jsx'
 import Start from './components/Start.jsx'
 import XapiViewer from './components/XapiViewer.jsx'
 
-// The quiz fills the space it's given (a full window, or an iframe on another page)
+// The quiz fills the space it's given (a full window, or an iframe on another page). A wide, short
+// space (a Lectora Web Window, a phone on its side) gets the landscape layout: two columns and a slim
+// top bar (index.css), so it's sized to a shorter design. LANDSCAPE is the same test as the CSS's.
 const SIZER = { designWidth: 900, designHeight: 820, fitHeight: true, minScale: 0.8, maxScale: 1.8, reflowBelow: 36 }
+const LANDSCAPE_SIZER = { designWidth: 860, designHeight: 470, fitHeight: true, minScale: 0.8, maxScale: 1.8, reflowBelow: 30 }
+const LANDSCAPE = '(min-aspect-ratio: 3/2) and (max-height: 600px)'
+
+function useLandscape() {
+  const query = useMemo(() => window.matchMedia(LANDSCAPE), [])
+  return useSyncExternalStore(
+    (onChange) => { query.addEventListener('change', onChange); return () => query.removeEventListener('change', onChange) },
+    () => query.matches,
+  )
+}
 
 // One attempt goes: start → each question (answer, check, feedback) → results.
 export default function App() {
@@ -21,7 +33,8 @@ export default function App() {
 
   const [fluid, setFluid] = useState(true)
   const sizerRef = useRef(null)
-  const scale = useSizer(sizerRef, { ...SIZER, enabled: fluid })
+  const landscape = useLandscape()
+  const scale = useSizer(sizerRef, { ...(landscape ? LANDSCAPE_SIZER : SIZER), enabled: fluid })
   const pageRef = useRef(null)
   useEffect(() => reportHeight(pageRef.current), [])
 
