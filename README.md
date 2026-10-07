@@ -87,6 +87,7 @@ Verbs are ADL's (`http://adlnet.gov/expapi/verbs/…`). Activities are
 | `src/` | The React app: `App.jsx`, `components/` (including `XapiViewer.jsx`), `recorder.js` (server or LMS, with the live log), `xapiText.js` (statements in words), `launch.js`, `embed.js`, `sizer.js` |
 | `public/embed-demo.html` | The embedding demo |
 | `public/lectora.js` | For a Lectora / SCORM course page: the learner in, the score into SCORM |
+| `docs/` | The Lectora guide, and `lectora-preview.html`: a stand-in Lectora page to try `lectora.js` (not published) |
 | `deploy/` | Setup and deploy scripts for the VPS, and its systemd unit |
 
 A question is `{ id, type: 'choice', prompt, choices: [{ id, text }], answer, explanation }` or

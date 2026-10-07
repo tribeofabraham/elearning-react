@@ -56,6 +56,11 @@ Options on the script tag:
 
 If the quiz is taken again, the newest attempt's score replaces the last one.
 
+**Previewing it** before publishing: open `docs/lectora-preview.html` (from this repo, in a
+browser). It's a stand-in Lectora page: the live quiz in an 820 × 434 Web Window, `lectora.js`, and
+Lectora's variables faked, with a panel showing what the course would send to SCORM. It isn't
+published on the quiz's site.
+
 **Testing it:** publish the Lectora course as SCORM, upload it to SCORM Cloud, launch it there,
 take the quiz, then look at the registration's score and status in SCORM Cloud. With
 `data-debug="on"` the console shows `Lectora: AICC_Score = 90 / AICC_Lesson_Status = passed`.

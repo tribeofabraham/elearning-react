@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lectora page preview · Tribe of Abraham e-learning</title>
+  <meta name="description" content="A stand-in for the Lectora page: the quiz in an 820 × 434 Web Window with lectora.js, showing what the course would send to SCORM." />
+  <link rel="icon" href="favicon.ico" sizes="any" />
+  <style>
+    /* A stand-in Lectora page: the Web Window at the course's size, lectora.js, and Lectora's reserved
+       variables faked, so you can see what the course would send to SCORM before republishing. */
+    :root { --bg: #e9e6df; --ink: #1b1b1b; --muted: #555; --line: #b9b2a2; --ok: #1d6b2a; --bad: #a32020; }
+    * { box-sizing: border-box; margin: 0; }
+    body { background: var(--bg); color: var(--ink); font: 1rem/1.5 system-ui, sans-serif; padding: 1.5rem 1rem; }
+    main { max-width: 74rem; margin: 0 auto; display: grid; gap: 1.2rem; grid-template-columns: minmax(0, 1fr); }
+    h1 { font-size: 1.4rem; }
+    h2 { font-size: 1.05rem; margin-bottom: 0.5rem; }
+    p { color: var(--muted); max-width: 46rem; }
+    .stage { display: flex; flex-wrap: wrap; gap: 1.2rem; align-items: flex-start; }
+    .webwindow { width: 820px; max-width: 100%; height: 434px; border: 0; background: #000; outline: 1px dashed #777; outline-offset: 3px; }
+    .scorm { flex: 1; min-width: 16rem; background: #fff; border: 1px solid var(--line); border-radius: 0.4rem; padding: 1rem; }
+    table { border-collapse: collapse; width: 100%; font-size: 0.95rem; }
+    th, td { text-align: left; padding: 0.35rem 0.4rem; border-bottom: 1px solid #ddd; vertical-align: top; }
+    th { font-weight: 600; white-space: nowrap; }
+    td code { font-size: 0.85rem; color: var(--muted); }
+    .value { font-weight: 700; }
+    .is-passed { color: var(--ok); }
+    .is-failed { color: var(--bad); }
+    .log { margin-top: 0.8rem; font: 0.8rem/1.4 Consolas, monospace; color: var(--muted); white-space: pre-wrap; }
+    label { display: inline-flex; gap: 0.4rem; align-items: center; margin-right: 1rem; }
+    input[type=text] { font: inherit; padding: 0.2rem 0.4rem; border: 1px solid #888; border-radius: 0.25rem; }
+    button { font: inherit; padding: 0.25rem 0.8rem; border: 1px solid #555; border-radius: 0.25rem; background: #fff; cursor: pointer; }
+    :focus-visible { outline: 2px solid #000; outline-offset: 2px; }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Lectora page preview</h1>
+      <p>A stand-in for the course page: the quiz in a Web Window at your course's size (820 × 434), the one-line
+        <code>lectora.js</code>, and Lectora's own variables faked, so you can see what the course would send to SCORM.
+        The quiz is the live one, so attempts are recorded in its LRS as usual.</p>
+    </header>
+
+    <form id="who" aria-label="The learner, as Lectora would know them">
+      <label>AICC_Student_Name <input type="text" id="name" value="Mark Snyder" /></label>
+      <label>AICC_Student_ID <input type="text" id="sid" value="msnyder" /></label>
+      <button type="submit">Reload the quiz as this learner</button>
+    </form>
+
+    <div class="stage">
+      <iframe class="webwindow" id="webwindow" title="MIDI Basics quiz (the Web Window)"
+              src="https://learn.tribeofabraham.com/?quiz=midi-basics&amp;xapi-panel=0"></iframe>
+
+      <section class="scorm" aria-labelledby="scorm-title">
+        <h2 id="scorm-title">What the course would send to SCORM</h2>
+        <table>
+          <thead><tr><th scope="col">Lectora variable</th><th scope="col">Value</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">AICC_Score<br><code>cmi.score.raw, scaled</code></th><td class="value" id="v-score">0</td></tr>
+            <tr><th scope="row">AICC_Lesson_Status<br><code>cmi.success_status</code></th><td class="value" id="v-status">unknown</td></tr>
+            <tr><th scope="row">CMI_Completion_Status<br><code>cmi.completion_status</code></th><td class="value" id="v-completion">incomplete</td></tr>
+          </tbody>
+        </table>
+        <!-- Announced as it changes, so a screen reader hears the course react -->
+        <p class="log" id="log" aria-live="polite">Take the quiz: these change when it's finished.</p>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    // Stand-ins for Lectora's Variable objects (getValue / set), under the names Lectora publishes:
+    // its reserved ones by name (AICC_Score), a course's own as Var<name>.
+    function Variable(name, value) { this.name = name; this.value = value }
+    Variable.prototype.getValue = function () { return this.value }
+    Variable.prototype.set = function (v) {
+      this.value = v
+      show()
+      document.getElementById('log').textContent = new Date().toLocaleTimeString() + '  ' + this.name + ' = ' + v + '\n' + document.getElementById('log').textContent.replace(/^Take the quiz.*$/m, '')
+    }
+    var AICC_Student_Name = new Variable('AICC_Student_Name', 'Mark Snyder')
+    var AICC_Student_ID = new Variable('AICC_Student_ID', 'msnyder')
+    var AICC_Score = new Variable('AICC_Score', '0')
+    var AICC_Lesson_Status = new Variable('AICC_Lesson_Status', 'unknown')
+    var CMI_Completion_Status = new Variable('CMI_Completion_Status', 'incomplete')
+
+    function show() {
+      document.getElementById('v-score').textContent = AICC_Score.getValue() + (AICC_Score.getValue() !== '0' ? '  (scaled ' + AICC_Score.getValue() / 100 + ')' : '')
+      var s = document.getElementById('v-status')
+      s.textContent = AICC_Lesson_Status.getValue()
+      s.className = 'value is-' + AICC_Lesson_Status.getValue()
+      document.getElementById('v-completion').textContent = CMI_Completion_Status.getValue()
+    }
+
+    // The learner, as Lectora would know them: change and reload (lectora.js adds them to the quiz's
+    // address on load). Kept for this tab only.
+    try {
+      var saved = JSON.parse(sessionStorage.getItem('preview-learner') || 'null')
+      if (saved) { AICC_Student_Name.value = saved[0]; AICC_Student_ID.value = saved[1] }
+    } catch (e) { /* the defaults it is */ }
+    document.getElementById('name').value = AICC_Student_Name.value
+    document.getElementById('sid').value = AICC_Student_ID.value
+    document.getElementById('who').addEventListener('submit', function (e) {
+      e.preventDefault()
+      try {
+        sessionStorage.setItem('preview-learner', JSON.stringify([document.getElementById('name').value, document.getElementById('sid').value]))
+      } catch (err) { /* can't keep it: the defaults on reload */ }
+      location.reload()
+    })
+  </script>
+  <!-- The one line the Lectora page gets -->
+  <script src="https://learn.tribeofabraham.com/lectora.js" data-debug="on"></script>
+</body>
+</html>
