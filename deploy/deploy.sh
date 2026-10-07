@@ -23,7 +23,8 @@ if [ "$ahead" -gt 0 ]; then echo "✖ You have $ahead commit(s) not on GitHub. R
 commit=$(git rev-parse --short HEAD)
 
 echo "Testing and building…"
-npm ci --silent --no-audit --no-fund
+# install, not ci: it leaves an up-to-date node_modules alone, so a running dev server is no obstacle
+npm install --silent --no-audit --no-fund
 npm test --silent >/dev/null 2>&1 || { npm test; echo "✖ Tests failed. Nothing was deployed."; exit 1; }
 npm run build --silent >/dev/null || { echo "✖ The page didn't build. Nothing was deployed."; exit 1; }
 
