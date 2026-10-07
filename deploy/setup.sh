@@ -49,7 +49,7 @@ echo "  ✔ Service elearning-react (starts once the app is deployed)"
 
 # -- 3. Caddy, once the DNS is in place --
 here=$(curl -s -4 -m 10 https://api.ipify.org || true)
-there=$(getent ahostsv4 "$DOMAIN" | awk 'NR==1{print $1}')
+there=$( (getent ahostsv4 "$DOMAIN" || true) | awk 'NR==1{print $1}')   # empty while there's no record
 if grep -q "^$DOMAIN {" /etc/caddy/Caddyfile; then
   echo "  ✔ Caddy already serves https://$DOMAIN"
 elif [ -z "$there" ] || [ "$there" != "$here" ]; then
