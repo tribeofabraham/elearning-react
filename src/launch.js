@@ -3,7 +3,7 @@
 //   ?quiz=midi-basics                        which quiz (the default if left out)
 //   &xapi-panel=0                            hide the xAPI viewer's button in the footer
 //
-// The learner, when the page embedding the quiz already knows them (an LMS course in Lectora, say):
+// The learner, when the page embedding the quiz already knows them (an LMS course, say):
 //
 //   &learner_name=Ada%20Lovelace&learner_email=ada@example.com     or  &learner_id=<their LMS id>
 //
@@ -18,7 +18,7 @@
 // Without those, the quiz asks who you are and records through this app's own server.
 import { emailError, normalizeEmail } from '../shared/email.js'
 import { DEFAULT_QUIZ, QUIZZES } from '../shared/quizzes/index.js'
-import { ACCOUNT_ID } from '../shared/xapi.js'
+import { ACCOUNT_ID, displayName, homePageOrigin } from '../shared/xapi.js'
 
 export function readLaunch(search = window.location.search) {
   const params = new URLSearchParams(search)
@@ -58,14 +58,20 @@ const readLearner = (params) => learnerFrom({
 })
 
 // A learner from what a host page gave (in the address, or in a message: embed.js), as
-// { name, email } or { name, accountId }, or null. An id that's an email address counts as one.
-// A bad email or id is ignored (the quiz then asks), so a host can't record someone as the wrong
-// person by mistake.
-export function learnerFrom({ name, email, id } = {}) {
-  const cleanName = typeof name === 'string' ? name.trim().slice(0, 100) : ''
+// { name, email } or { name, accountId, homePage? }, or null. All of it is unverified input, so it's
+// cleaned: the name tidied (and an LMS's "Last, First" turned round), homePage reduced to an http(s)
+// origin, a bad email or id ignored (the quiz then asks, so a host can't record the wrong person by
+// mistake). An id with the LMS's homePage is that LMS's account id, even if it looks like an email;
+// without one, an id that's an email address counts as an email.
+export function learnerFrom({ name, email, id, homePage } = {}) {
+  const cleanName = displayName(name)
   const cleanId = typeof id === 'string' ? id.trim() : ''
-  const asEmail = normalizeEmail(email || (cleanId.includes('@') ? cleanId : ''))
-  if (asEmail && !emailError(asEmail)) return { name: cleanName, email: asEmail }
+  const home = homePageOrigin(homePage)
+  const givenEmail = normalizeEmail(email)
+  if (givenEmail && !emailError(givenEmail)) return { name: cleanName, email: givenEmail }
+  if (cleanId && home && ACCOUNT_ID.test(cleanId)) return { name: cleanName, accountId: cleanId, homePage: home }
+  const idEmail = cleanId.includes('@') ? normalizeEmail(cleanId) : ''
+  if (idEmail && !emailError(idEmail)) return { name: cleanName, email: idEmail }
   if (cleanId && ACCOUNT_ID.test(cleanId)) return { name: cleanName, accountId: cleanId }
   return null
 }

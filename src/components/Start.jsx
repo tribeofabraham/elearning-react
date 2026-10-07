@@ -4,9 +4,9 @@ import { actorLabel } from '../launch.js'
 import { anonymousId } from '../recorder.js'
 
 // The quiz's title and what to expect, and who the attempt is recorded as: the LMS's learner when an
-// LMS launched it, the learner the embedding page passed in (a Lectora course, say), or else whoever
-// the learner says they are (a name and email, or anonymous).
-export default function Start({ quiz, lms, learner, onStart }) {
+// LMS launched it, the learner the embedding page passed in, or else whoever the learner says they
+// are (a name and email, or anonymous; knownName fills in the name if the page knew only that).
+export default function Start({ quiz, lms, learner, knownName = '', onStart }) {
   const emailRef = useRef(null)
   const [emailProblem, setEmailProblem] = useState('')
   const count = quiz.questions.length
@@ -57,7 +57,8 @@ export default function Start({ quiz, lms, learner, onStart }) {
             </p>
             <div className="field">
               <label htmlFor="name">Name</label>
-              <input id="name" name="name" type="text" autoComplete="name" maxLength={100} aria-describedby="learner-hint" />
+              <input id="name" name="name" type="text" autoComplete="name" maxLength={100} aria-describedby="learner-hint"
+                     key={knownName} defaultValue={knownName} />
             </div>
             <div className="field">
               <label htmlFor="email">Email</label>

@@ -10,9 +10,12 @@
 //
 // From the page (only from the page embedding it), before the quiz is started:
 //
-//   { source: 'elearning-host', type: 'learner', name, id }     (or email in place of id)
+//   { source: 'elearning-host', type: 'learner', name, id, homePage }
 //
-// Then the quiz doesn't ask who's taking it. Sent as a message, the learner stays out of addresses
+// name: as the LMS has it ("Last, First" is turned round); id: their LMS id; homePage: the LMS's
+// address, so the id is recorded as that LMS's account (or email in place of id). Any may be empty.
+// With an id, the quiz doesn't ask who's taking it; with only a name, it fills in the name. All of
+// it is treated as unverified input (launch.js learnerFrom). Sent as a message, the learner stays out of addresses
 // and server logs. The page can send it on 'ready' and/or straight away; either order works.
 
 const embedded = window.parent !== window
@@ -42,7 +45,7 @@ export function listenForLearner(onLearner) {
   const listen = (e) => {
     const d = e.data
     if (e.source !== window.parent || !d || d.source !== 'elearning-host' || d.type !== 'learner') return
-    onLearner({ name: d.name, id: d.id, email: d.email })
+    onLearner({ name: d.name, id: d.id, email: d.email, homePage: d.homePage })
   }
   window.addEventListener('message', listen)
   tellHost('ready')

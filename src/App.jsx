@@ -3,6 +3,7 @@ import logo from './assets/LogoOnly.svg'
 import { scoreAttempt } from '../shared/quiz.js'
 import { listenForLearner, reportHeight, tellHost } from './embed.js'
 import { learnerFrom, readLaunch } from './launch.js'
+import { displayName } from '../shared/xapi.js'
 import { createRecorder } from './recorder.js'
 import { useSizer } from './sizer.js'
 import Question from './components/Question.jsx'
@@ -11,7 +12,7 @@ import Start from './components/Start.jsx'
 import XapiViewer from './components/XapiViewer.jsx'
 
 // The quiz fills the space it's given (a full window, or an iframe on another page). A wide, short
-// space (a Lectora Web Window, a phone on its side) gets the landscape layout: two columns and a slim
+// space (a course's web window, a phone on its side) gets the landscape layout: two columns and a slim
 // top bar (index.css), so it's sized to a shorter design. LANDSCAPE is the same test as the CSS's.
 const SIZER = { designWidth: 900, designHeight: 820, fitHeight: true, minScale: 0.8, maxScale: 1.8, reflowBelow: 36 }
 const LANDSCAPE_SIZER = { designWidth: 860, designHeight: 470, fitHeight: true, minScale: 0.8, maxScale: 1.8, reflowBelow: 30 }
@@ -50,12 +51,15 @@ export default function App() {
   // The learner, if the address or the page embedding the quiz says who it is (until the quiz starts;
   // an LMS launch has its own)
   const [learner, setLearner] = useState(givenLearner)
+  const [knownName, setKnownName] = useState('')   // a name alone: filled in, the learner can change it
   const started = useRef(false)
   useEffect(() => {
     if (lms) return undefined
     return listenForLearner((sent) => {
+      if (started.current) return
       const found = learnerFrom(sent)
-      if (found && !started.current) setLearner(found)
+      if (found) setLearner(found)
+      else setKnownName(displayName(sent.name))
     })
   }, [lms])
 
@@ -116,7 +120,7 @@ export default function App() {
             even one that can't scroll itself (a course's web window) */}
         <main className="main" ref={mainRef}>
           <div className="main-content" ref={contentRef}>
-            {screen === 'start' && <Start quiz={quiz} lms={lms} learner={learner} onStart={start} />}
+            {screen === 'start' && <Start quiz={quiz} lms={lms} learner={learner} knownName={knownName} onStart={start} />}
             {screen === 'question' && (
               <Question key={quiz.questions[index].id} quiz={quiz} index={index}
                         onAnswer={answer} onNext={next} />

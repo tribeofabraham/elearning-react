@@ -114,13 +114,33 @@ export function statementsFor(attempt, event, { newId, now }) {
 }
 
 // An actor for a learner: their email if there is one; else an account, named by the id their LMS
-// gave (accountId) or an anonymous id. homePage: the site that vouches for those ids.
-export function learnerActor({ name, email, accountId, anonymousId }, homePage) {
+// gave (accountId) or an anonymous id. An LMS id belongs to that LMS, so its account's homePage is
+// the LMS's (learner.homePage) when known; otherwise, and for anonymous ids, defaultHome (this site).
+export function learnerActor({ name, email, accountId, anonymousId, homePage }, defaultHome) {
   const actor = { objectType: 'Agent' }
   if (name) actor.name = name
   if (email) actor.mbox = `mailto:${email}`
-  else actor.account = { homePage, name: accountId ?? anonymousId }
+  else actor.account = { homePage: (accountId && homePage) || defaultHome, name: accountId ?? anonymousId }
   return actor
+}
+
+// The origin of a web address (https://lms.example.com), or null if it isn't an http(s) one.
+export function homePageOrigin(value) {
+  if (typeof value !== 'string' || value.length > 2000) return null
+  try {
+    const url = new URL(value.trim())
+    return url.protocol === 'https:' || url.protocol === 'http:' ? url.origin : null
+  } catch { return null }
+}
+
+// A learner's name as it's shown and recorded: control characters gone, spaces tidied, at most 100
+// characters, and an LMS's "Last, First" turned round to "First Last".
+export function displayName(value) {
+  if (typeof value !== 'string') return ''
+  const name = value.replace(/[\u0000-\u001f\u007f-\u009f]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 100)
+  const parts = name.split(',')
+  if (parts.length === 2 && parts[0].trim() && parts[1].trim()) return `${parts[1].trim()} ${parts[0].trim()}`
+  return name
 }
 
 // An LMS's learner id: letters, digits and . _ @ : + - only, so it's safe in an IRI and a log.

@@ -21,6 +21,7 @@ if (!window.quizBridge) {
       source: 'elearning-host', type: 'learner',
       name: read(typeof AICC_Student_Name !== 'undefined' ? AICC_Student_Name : undefined),
       id: read(typeof AICC_Student_ID !== 'undefined' ? AICC_Student_ID : undefined),
+      homePage: window.location.origin,   // the LMS serving the course: the id is its account
     }, QUIZ)
   }
 

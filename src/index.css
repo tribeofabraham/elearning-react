@@ -225,7 +225,7 @@ h1 { font-size: 2em; }
   h1, .question .prompt { font-size: 1.5em; }
 }
 
-/* Landscape: a wide, short frame (a Lectora Web Window, a phone on its side). The same content in two
+/* Landscape: a wide, short frame (a course's web window, a phone on its side). The same content in two
    columns under a slim top bar, so it fits the height instead of running off the bottom. Only the
    placement changes, never the order, so screen readers and the keyboard go through it as always.
    App.jsx sizes it to a shorter design on the same test. */

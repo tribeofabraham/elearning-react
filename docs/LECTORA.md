@@ -88,12 +88,19 @@ to the page. Send it, to the quiz's frame and origin only:
 
 ```js
 frame.contentWindow.postMessage(
-  { source: 'elearning-host', type: 'learner', name: 'Ada Lovelace', id: 'ada@example.com' },
+  { source: 'elearning-host', type: 'learner', name: 'Lovelace, Ada', id: 'alovelace', homePage: location.origin },
   'https://learn.tribeofabraham.com')
 ```
 
-`id` is their LMS id (letters, digits and `. _ @ : + -`, up to 100) or an email address (`email`
-works too). Send it on `ready`, or straight away, or both: the quiz takes it any time before it's
+- `name`: as the LMS has it; "Last, First" is shown and recorded as "First Last".
+- `id`: their LMS id (letters, digits and `. _ @ : + -`, up to 100).
+- `homePage`: the LMS's address (the course page's `location.origin`). With it, the learner is
+  recorded as that LMS's account, `{ name, account: { homePage, name: id } }`; without it, under
+  the quiz's own address (and an id that's an email address is recorded as an email).
+- Any may be empty. With an id, the quiz doesn't ask who's taking it; with only a name, it fills
+  in the name and asks the rest; with nothing, it's as if no message came.
+- All of it is treated as unverified input: the name is tidied, `homePage` cut to an http(s)
+  origin, and a bad id ignored. Send it on `ready`, or straight away, or both: the quiz takes it any time before it's
 started, and only from the page embedding it. (The same can go in the address as `learner_name`
 with `learner_email` or `learner_id`, but a message keeps it out of server logs.) A bad email or id
 is ignored and the quiz asks instead, so a course can't record the wrong person.

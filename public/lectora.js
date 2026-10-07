@@ -67,7 +67,7 @@
     for (var i = 0; i < frames.length; i++) {
       var f = frames[i]
       if (!f.src || f.src.indexOf(QUIZ) !== 0 || !f.contentWindow) continue
-      f.contentWindow.postMessage({ source: 'elearning-host', type: 'learner', name: name, id: id }, QUIZ)
+      f.contentWindow.postMessage({ source: 'elearning-host', type: 'learner', name: name, id: id, homePage: window.location.origin }, QUIZ)
       log('learner sent', name, id)
     }
   }

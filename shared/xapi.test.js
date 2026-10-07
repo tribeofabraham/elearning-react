@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import midiBasics from './quizzes/midi-basics.js'
-import { isoDuration, learnerActor, statementsFor } from './xapi.js'
+import { displayName, homePageOrigin, isoDuration, learnerActor, statementsFor } from './xapi.js'
 
 let n = 0
 const opts = { newId: () => `id-${++n}`, now: '2026-10-07T12:00:00.000Z' }
@@ -68,4 +68,23 @@ test('learners: by email, or as an anonymous account', () => {
     { objectType: 'Agent', account: { homePage: 'https://x', name: 'abc' } })
   assert.deepEqual(learnerActor({ name: 'Ada', accountId: 'jsmith42' }, 'https://x'),
     { objectType: 'Agent', name: 'Ada', account: { homePage: 'https://x', name: 'jsmith42' } })
+  // An LMS id under the LMS's own address
+  assert.deepEqual(learnerActor({ name: 'Ada', accountId: 'jsmith42', homePage: 'https://lms.example.com' }, 'https://x'),
+    { objectType: 'Agent', name: 'Ada', account: { homePage: 'https://lms.example.com', name: 'jsmith42' } })
+})
+
+test('an LMS address is reduced to its origin, and only http(s) counts', () => {
+  assert.equal(homePageOrigin('https://cloud.scorm.com/content/abc?x=1'), 'https://cloud.scorm.com')
+  assert.equal(homePageOrigin('javascript:alert(1)'), null)
+  assert.equal(homePageOrigin('not a url'), null)
+  assert.equal(homePageOrigin(''), null)
+})
+
+test('names: "Last, First" turned round, tidied', () => {
+  assert.equal(displayName('Snyder, Mark'), 'Mark Snyder')
+  assert.equal(displayName('  Mark   Snyder '), 'Mark Snyder')
+  assert.equal(displayName('Snyder,'), 'Snyder,')
+  assert.equal(displayName('a,b,c'), 'a,b,c')
+  assert.equal(displayName('Ma\u0000rk'), 'Ma rk')
+  assert.equal(displayName(42), '')
 })
