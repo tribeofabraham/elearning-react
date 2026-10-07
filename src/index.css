@@ -183,13 +183,31 @@ fieldset:disabled .choice.chosen:hover { background: var(--raised); }
 
 /* Footer */
 .foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.6em 1em; margin-top: 1.4em; font-size: 0.85em; color: var(--muted); }
-.scale-toggle {
-  background: transparent; border: 0.08em solid var(--edge); border-radius: 0.35em; padding: 0.3em 0.8em; color: var(--muted);
+/* Auto-scale text: a switch. On and off differ three ways, not by colour alone: the knob's side,
+   the track's fill (brass when on, black when off) and the word beside it. */
+.scale-switch {
+  display: inline-flex; align-items: center; gap: 0.6em;
+  background: transparent; border: 0.08em solid var(--edge); border-radius: 2em;
+  padding: 0.35em 0.7em 0.35em 1em; color: var(--cream);
 }
-.scale-toggle[aria-pressed='true'] { border-color: var(--brass); color: var(--brass-light); }
+.scale-switch:hover { background: var(--raised); }
+.switch-track {
+  position: relative; width: 2.6em; height: 1.4em; flex-shrink: 0;
+  border-radius: 1em; background: var(--bg); border: 0.1em solid var(--edge);
+  transition: background 0.15s, border-color 0.15s;
+}
+.switch-knob {
+  position: absolute; top: 50%; left: 0.15em; width: 0.95em; height: 0.95em; border-radius: 50%;
+  background: var(--muted); transform: translateY(-50%); transition: left 0.15s, background 0.15s;
+}
+.switch-state { min-width: 1.7em; font-weight: 500; color: var(--muted); }
+.scale-switch[aria-checked='true'] { border-color: var(--brass); }
+.scale-switch[aria-checked='true'] .switch-track { background: var(--brass); border-color: var(--brass); }
+.scale-switch[aria-checked='true'] .switch-knob { left: calc(100% - 1.1em); background: #000; }
+.scale-switch[aria-checked='true'] .switch-state { color: var(--brass-light); }
 
 @media (prefers-reduced-motion: reduce) {
-  .progress-bar span, .choice { transition: none; }
+  .progress-bar span, .choice, .switch-track, .switch-knob { transition: none; }
 }
 
 /* Phones */

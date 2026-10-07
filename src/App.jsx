@@ -102,8 +102,12 @@ export default function App() {
 
         <footer className="foot">
           <p>© {new Date().getFullYear()} <a href="https://tribeofabraham.com">Tribe of Abraham</a> · xAPI e-learning</p>
-          <button type="button" className="scale-toggle" aria-pressed={fluid} onClick={() => setFluid(!fluid)}>
+          {/* A switch: its name stays "Auto-scale text" and it reports on / off itself, so the
+              visible On / Off is for the eye only (screen readers would otherwise hear it twice) */}
+          <button type="button" role="switch" aria-checked={fluid} className="scale-switch" onClick={() => setFluid(!fluid)}>
             Auto-scale text
+            <span className="switch-track" aria-hidden="true"><span className="switch-knob" /></span>
+            <span className="switch-state" aria-hidden="true">{fluid ? 'On' : 'Off'}</span>
           </button>
         </footer>
 

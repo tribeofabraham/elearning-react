@@ -31,3 +31,9 @@ test('black on the brass buttons, normal and hovered', () => {
 test('the edges of controls show at 3:1', () => {
   for (const edge of [EDGE, BRASS, BRASS_LIGHT, RIGHT, WRONG]) for (const bg of [BG, SURFACE, RAISED, PANEL]) check(edge, bg, 3)
 })
+
+test('the Auto-scale switch: the knob shows on its track, on and off', () => {
+  check(MUTED, BG, 3)          // off: grey knob on the black track
+  check('#000000', BRASS, 3)   // on: black knob on the brass track
+  check(BRASS, BG, 3)          // the brass track itself, against the page
+})
