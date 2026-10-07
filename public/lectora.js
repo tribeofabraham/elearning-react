@@ -26,12 +26,17 @@
   var debug = me.getAttribute('data-debug') === 'on'
   var log = function () { if (debug && window.console) console.log.apply(console, ['[elearning-react]'].concat([].slice.call(arguments))) }
 
-  // A Lectora variable, if this is a Lectora page and it has it (Lectora makes them globals named Var<name>)
+  // A Lectora variable, if this is a Lectora page and it has it. Lectora makes them page globals:
+  // its own reserved ones under their names (AICC_Score), the course's own as Var<name> (VarQuizScore).
   function lectoraVar(name) {
-    try {
-      var v = window['Var' + name]
-      return v && typeof v.getValue === 'function' && typeof v.set === 'function' ? v : null
-    } catch (e) { return null }
+    var names = [name, 'Var' + name]
+    for (var i = 0; i < names.length; i++) {
+      try {
+        var v = window[names[i]]
+        if (v && typeof v.getValue === 'function' && typeof v.set === 'function') return v
+      } catch (e) { /* not here */ }
+    }
+    return null
   }
   function value(name) {
     var v = lectoraVar(name)
@@ -76,12 +81,20 @@
   function report(score, passed) {
     var percent = Math.round(score.scaled * 100)
 
+    // Lectora sends these to the LMS as they're set: AICC_Score as the score (SCORM 2004: raw, and
+    // scaled = score / 100), AICC_Lesson_Status as passed / failed (2004: cmi.success_status; 1.2:
+    // cmi.core.lesson_status), CMI_Completion_Status (2004) as completed.
     var lectoraScore = lectoraVar('AICC_Score')
     if (lectoraScore) {
       lectoraScore.set(String(percent))
-      var status = lectoraVar('AICC_Lesson_Status')
-      if (setStatus && status) status.set(passed ? 'passed' : 'failed')
-      log('Lectora: AICC_Score =', percent, setStatus ? '/ AICC_Lesson_Status = ' + (passed ? 'passed' : 'failed') : '')
+      var said = ['AICC_Score = ' + percent]
+      if (setStatus) {
+        var status = lectoraVar('AICC_Lesson_Status')
+        if (status) { status.set(passed ? 'passed' : 'failed'); said.push('AICC_Lesson_Status = ' + (passed ? 'passed' : 'failed')) }
+        var completion = lectoraVar('CMI_Completion_Status')
+        if (completion) { completion.set('completed'); said.push('CMI_Completion_Status = completed') }
+      }
+      log('Lectora:', said.join(' / '))
       return 'lectora'
     }
 

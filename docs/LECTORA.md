@@ -16,8 +16,10 @@ Add a Web Window to the page and set its address to:
 https://learn.tribeofabraham.com/?quiz=midi-basics&xapi-panel=0
 ```
 
-- Give it room: about 900 × 700 or more. The quiz scales to fit, and scrolls inside the window on
-  the results page.
+- Give it room: **about 900 × 700 or more**, and **turn scrolling on** in the Web Window's
+  properties. The quiz needs about 700 pixels of height; in a shorter window with scrolling off
+  (Lectora's default is "no"), the feedback, Next button and results end up below the frame where a
+  mouse can't reach them. The quiz scales to fit, and scrolls on the results page.
 - `xapi-panel=0` hides the small "{ } xAPI" button in the quiz's footer, which is there for demos.
   Leave it off to show the statements as they're sent.
 - The quiz asks who's taking it (a name and email, or anonymous), unless step 2 passes that in.
@@ -36,8 +38,10 @@ That script, served by the quiz:
 1. **Tells the quiz who the learner is**, from Lectora's `AICC_Student_Name` and `AICC_Student_ID`,
    so the quiz doesn't ask. (An id that's an email address is recorded as one.)
 2. **Puts the score into the course's SCORM record** when the quiz is finished:
-   - in Lectora, by setting `AICC_Score` (the percentage) and `AICC_Lesson_Status` (`passed` or
-     `failed`), which Lectora reports to the LMS itself, alongside everything else it reports;
+   - in Lectora, by setting its reserved variables, which Lectora sends to the LMS as they change:
+     `AICC_Score` (the percentage; in SCORM 2004 Lectora sends it as `cmi.score.raw` and
+     `cmi.score.scaled` = score / 100), `AICC_Lesson_Status` (`passed` or `failed`; 2004:
+     `cmi.success_status`) and, in SCORM 2004, `CMI_Completion_Status` (`completed`);
    - on a page that isn't Lectora's, straight to the LMS's SCORM API (2004 or 1.2).
 
 Options on the script tag:
@@ -73,8 +77,11 @@ or id is ignored and the quiz asks instead, so a course can't record the wrong p
   score: { raw: 8, max: 10, scaled: 0.8 }, passed: true }
 ```
 
-For example, to put it in Lectora variables of your own (`QuizScore`, `QuizPassed`) for Lectora's
-actions to use:
+Note that in a published Lectora page the course's own variables are named `Var` + their name
+(`VarQuizScore`), but Lectora's reserved ones keep their names (`AICC_Score`, `AICC_Lesson_Status`).
+Setting only `AICC_Score` sends the score but leaves passed / failed to whatever else decides it, so
+set `AICC_Lesson_Status` as well. For example, to put the result in variables of your own
+(`QuizScore`, `QuizPassed`) for Lectora's actions to use:
 
 ```html
 <script>
