@@ -12,8 +12,11 @@ Record Store (LRS) such as SCORM Cloud.
 - **See the xAPI as it's sent:** a small "{ } xAPI" button in the footer (an easter egg for demos)
   opens a dialog listing each statement in plain words (who did what, the response, right or wrong,
   the score, the time), whether the LRS stored it, and its JSON. `?xapi-panel=0` hides the button.
-- **In Lectora:** in a Web Window, with the learner passed in and the score passed back. See
+- **In Lectora (or any SCORM course):** in a Web Window, plus one line on the page,
+  `<script src="https://learn.tribeofabraham.com/lectora.js"></script>`, which passes the learner in
+  and puts the score and passed / failed into the course's SCORM record. See
   [docs/LECTORA.md](docs/LECTORA.md).
+
 - **WCAG 2.2 AA:** keyboard and screen reader friendly (focus moves to each question and its
   feedback; right and wrong are said in words, not just colour), colour contrast held by a test,
   everything in em and scaled to the space by a sizer, with an Auto-scale text switch. Checked
@@ -82,6 +85,7 @@ Verbs are ADL's (`http://adlnet.gov/expapi/verbs/…`). Activities are
 | `server/index.js` | Express: `api/statements` to the LRS, plus the built page |
 | `src/` | The React app: `App.jsx`, `components/` (including `XapiViewer.jsx`), `recorder.js` (server or LMS, with the live log), `xapiText.js` (statements in words), `launch.js`, `embed.js`, `sizer.js` |
 | `public/embed-demo.html` | The embedding demo |
+| `public/lectora.js` | For a Lectora / SCORM course page: the learner in, the score into SCORM |
 | `deploy/` | Setup and deploy scripts for the VPS, and its systemd unit |
 
 A question is `{ id, type: 'choice', prompt, choices: [{ id, text }], answer, explanation }` or

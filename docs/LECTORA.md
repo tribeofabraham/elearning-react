@@ -4,9 +4,9 @@ The quiz runs at an address (https://learn.tribeofabraham.com), so in Lectora it
 Window** (web object) like any web page. It sizes itself to the window, records each attempt with
 xAPI in the quiz's own LRS (SCORM Cloud), and tells the course page its score.
 
-> The quiz side of this is tested. The Lectora side (menu names, how its variables are reached from
-> a script) is written from how Lectora generally works, not tried in Lectora itself: try it in a
-> test course before a real one, and adjust names to your version.
+> The quiz and `lectora.js` are tested against stand-ins for a Lectora page and for SCORM 1.2 and
+> 2004 LMSs. The Lectora side (menu names, its variables reaching the LMS) is written from how
+> Lectora generally works, not tried in Lectora itself: test in a course on SCORM Cloud first.
 
 ## 1. Just the quiz
 
@@ -22,54 +22,64 @@ https://learn.tribeofabraham.com/?quiz=midi-basics&xapi-panel=0
   Leave it off to show the statements as they're sent.
 - The quiz asks who's taking it (a name and email, or anonymous), unless step 2 passes that in.
 
-## 2. Tell the quiz who the learner is
+## 2. The learner in, the score out: one line
 
-When the course is running in an LMS, Lectora knows the learner. Pass them to the quiz and it skips
-its "Who is taking the quiz?" step:
-
-| Address option | What it is |
-| --- | --- |
-| `learner_name` | Their name, as shown in the LRS |
-| `learner_email` | Their email: recorded as their identity (`mailto:`) |
-| `learner_id` | Their LMS id, if there's no email: letters, digits and `. _ @ : + -`, up to 100 |
-
-A bad email or id is ignored and the quiz asks instead, so a course can't record someone as the
-wrong person.
-
-Lectora's reserved variables `AICC_Student_Name` and `AICC_Student_ID` hold the learner when the
-course is published to an LMS. In a script (an **HTML Extension** on the page, of the JavaScript
-kind), Lectora variables are objects named `Var` + the variable's name. This sets the Web Window's
-address from them once the page has loaded:
+On the same page as the Web Window, add an **HTML Extension** (the kind that holds HTML/JavaScript)
+with just:
 
 ```html
-<script>
-  window.addEventListener('load', function () {
-    var frame = document.querySelector('iframe[src*="learn.tribeofabraham.com"]')
-    if (!frame) return
-    var url = new URL(frame.src)
-    try { url.searchParams.set('learner_name', VarAICC_Student_Name.getValue()) } catch (e) {}
-    try { url.searchParams.set('learner_id', VarAICC_Student_ID.getValue()) } catch (e) {}
-    frame.src = url.toString()
-  })
-</script>
+<script src="https://learn.tribeofabraham.com/lectora.js"></script>
 ```
 
-If the LMS's student id is an email address, use `learner_email` in place of `learner_id`.
+That script, served by the quiz:
 
-## 3. Get the score back into Lectora
+1. **Tells the quiz who the learner is**, from Lectora's `AICC_Student_Name` and `AICC_Student_ID`,
+   so the quiz doesn't ask. (An id that's an email address is recorded as one.)
+2. **Puts the score into the course's SCORM record** when the quiz is finished:
+   - in Lectora, by setting `AICC_Score` (the percentage) and `AICC_Lesson_Status` (`passed` or
+     `failed`), which Lectora reports to the LMS itself, alongside everything else it reports;
+   - on a page that isn't Lectora's, straight to the LMS's SCORM API (2004 or 1.2).
 
-The quiz posts a message to the page around it when it's finished:
+Options on the script tag:
+
+| | |
+| --- | --- |
+| `data-status="off"` | Set the score only, not passed / failed (if the course decides those itself) |
+| `data-debug="on"` | Say what it does in the browser console (F12), for testing |
+
+If the quiz is taken again, the newest attempt's score replaces the last one.
+
+**Testing it:** publish the Lectora course as SCORM, upload it to SCORM Cloud, launch it there,
+take the quiz, then look at the registration's score and status in SCORM Cloud. With
+`data-debug="on"` the console shows `Lectora: AICC_Score = 90 / AICC_Lesson_Status = passed`.
+
+The quiz can't do this from inside its Web Window: it's a frame from another site, and browsers
+keep that out of the course's own SCORM connection. The script runs in the course's page, which can
+reach it.
+
+### Doing it by hand instead
+
+The script is the two pieces below; use them yourself if you'd rather, or to do something else with
+the result.
+
+**The learner:** the quiz reads `learner_name`, with `learner_email` or `learner_id` (their LMS id:
+letters, digits and `. _ @ : + -`, up to 100), from its address, and then doesn't ask. A bad email
+or id is ignored and the quiz asks instead, so a course can't record the wrong person.
+
+**The score:** when it's finished, the quiz posts this to the page around it:
 
 ```js
 { source: 'elearning-react', type: 'finished', quizId: 'midi-basics',
   score: { raw: 8, max: 10, scaled: 0.8 }, passed: true }
 ```
 
-Make two Lectora variables, say `QuizScore` and `QuizPassed`, then in the same HTML Extension:
+For example, to put it in Lectora variables of your own (`QuizScore`, `QuizPassed`) for Lectora's
+actions to use:
 
 ```html
 <script>
   window.addEventListener('message', function (e) {
+    if (e.origin !== 'https://learn.tribeofabraham.com') return
     if (!e.data || e.data.source !== 'elearning-react' || e.data.type !== 'finished') return
     VarQuizScore.set(String(Math.round(e.data.score.scaled * 100)))
     VarQuizPassed.set(e.data.passed ? 'true' : 'false')
@@ -77,19 +87,16 @@ Make two Lectora variables, say `QuizScore` and `QuizPassed`, then in the same H
 </script>
 ```
 
-Lectora's own actions can then use them: show a Next button only when `QuizPassed` is `true`, say,
-or set the course's score and completion for the LMS. (Lectora acts on a variable when something
-triggers an action, so check it on a button press or a timer rather than expecting the page to
-react the moment it changes.)
-
-There are other messages too, if they're useful: `started`, `answered` (with `questionId` and
-`correct`) and `resize` (with the quiz's `height`).
+There are other messages too: `started`, `answered` (with `questionId` and `correct`) and `resize`
+(with the quiz's `height`).
 
 ## Where the results go
 
-Each attempt is recorded in the quiz's LRS (SCORM Cloud): initialized, each answer, passed or
-failed with the score, and completed. That's separate from the LMS's own record of the Lectora
-course, which gets the score only if step 3 passes it on.
+Two records, which agree:
+
+- **The LMS (SCORM):** the course's score and passed / failed, set by `lectora.js` (step 2).
+- **The quiz's LRS (xAPI, in SCORM Cloud):** the detail. Initialized, every answer with its
+  response and time, passed or failed with the score, and completed.
 
 To have the quiz write straight to the LMS's own LRS instead, the LMS would launch it the standard
 xAPI way, with `endpoint`, `auth` and `actor` in the address (see the README). A Lectora Web Window

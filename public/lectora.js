@@ -1,0 +1,123 @@
+/*
+ * For the page around the quiz in a Lectora course (or any SCORM course). One line, in an HTML
+ * Extension on the page that has the quiz's Web Window:
+ *
+ *   <script src="https://learn.tribeofabraham.com/lectora.js"></script>
+ *
+ * 1. Tells the quiz who the learner is, from Lectora's AICC_Student_Name and AICC_Student_ID, so it
+ *    doesn't ask.
+ * 2. When the quiz is finished, puts the score into the course's SCORM record:
+ *    - in Lectora, through its own variables (AICC_Score as a percentage, AICC_Lesson_Status passed
+ *      or failed), so Lectora reports them to the LMS itself;
+ *    - otherwise straight to the LMS's SCORM API, 2004 (API_1484_11) or 1.2 (API).
+ *
+ * Options, as attributes on the script tag:
+ *   data-status="off"   set the score only, not passed / failed
+ *   data-debug="on"     log what it does in the browser console
+ *
+ * It only listens to messages from the quiz's own address. The quiz can't do this itself: in the
+ * course it's in a frame from another site, which browsers keep out of the course's SCORM.
+ */
+(function () {
+  'use strict'
+  var me = document.currentScript
+  var QUIZ = new URL(me.src).origin
+  var setStatus = me.getAttribute('data-status') !== 'off'
+  var debug = me.getAttribute('data-debug') === 'on'
+  var log = function () { if (debug && window.console) console.log.apply(console, ['[elearning-react]'].concat([].slice.call(arguments))) }
+
+  // A Lectora variable, if this is a Lectora page and it has it (Lectora makes them globals named Var<name>)
+  function lectoraVar(name) {
+    try {
+      var v = window['Var' + name]
+      return v && typeof v.getValue === 'function' && typeof v.set === 'function' ? v : null
+    } catch (e) { return null }
+  }
+  function value(name) {
+    var v = lectoraVar(name)
+    try { return v ? String(v.getValue() || '').trim() : '' } catch (e) { return '' }
+  }
+
+  // The LMS's SCORM API: in this window or one of its parents (or their openers), as the standard says
+  function findApi(names) {
+    var w = window
+    for (var hops = 0; w && hops < 20; hops++) {
+      for (var i = 0; i < names.length; i++) {
+        try { if (w[names[i]]) return { name: names[i], api: w[names[i]] } } catch (e) { /* another site's frame */ }
+      }
+      if (w.parent && w.parent !== w) w = w.parent
+      else { try { w = w.opener } catch (e) { w = null } }
+    }
+    return null
+  }
+
+  // -- 1. The learner, into each quiz frame's address --
+  function passLearner() {
+    var name = value('AICC_Student_Name')
+    var id = value('AICC_Student_ID')
+    if (!name && !id) return
+    var frames = document.querySelectorAll('iframe')
+    for (var i = 0; i < frames.length; i++) {
+      var f = frames[i]
+      if (!f.src || f.src.indexOf(QUIZ) !== 0) continue
+      var url = new URL(f.src)
+      if (url.searchParams.has('learner_name') || url.searchParams.has('learner_id') || url.searchParams.has('learner_email')) continue
+      if (name) url.searchParams.set('learner_name', name)
+      // An id that's an email address is recorded as one
+      if (id) url.searchParams.set(/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(id) ? 'learner_email' : 'learner_id', id)
+      log('learner', name, id)
+      f.src = url.toString()
+    }
+  }
+  if (document.readyState === 'complete') passLearner()
+  else window.addEventListener('load', passLearner)
+
+  // -- 2. The score, into SCORM --
+  function report(score, passed) {
+    var percent = Math.round(score.scaled * 100)
+
+    var lectoraScore = lectoraVar('AICC_Score')
+    if (lectoraScore) {
+      lectoraScore.set(String(percent))
+      var status = lectoraVar('AICC_Lesson_Status')
+      if (setStatus && status) status.set(passed ? 'passed' : 'failed')
+      log('Lectora: AICC_Score =', percent, setStatus ? '/ AICC_Lesson_Status = ' + (passed ? 'passed' : 'failed') : '')
+      return 'lectora'
+    }
+
+    var found = findApi(['API_1484_11', 'API'])
+    if (!found) { log('no Lectora variables and no SCORM API found: score not reported'); return 'none' }
+    var api = found.api
+    if (found.name === 'API_1484_11') {   // SCORM 2004
+      api.SetValue('cmi.score.scaled', String(score.scaled))
+      api.SetValue('cmi.score.raw', String(score.raw))
+      api.SetValue('cmi.score.min', '0')
+      api.SetValue('cmi.score.max', String(score.max))
+      if (setStatus) {
+        api.SetValue('cmi.success_status', passed ? 'passed' : 'failed')
+        api.SetValue('cmi.completion_status', 'completed')
+      }
+      api.Commit('')
+    } else {                               // SCORM 1.2: scores are 0-100
+      api.LMSSetValue('cmi.core.score.raw', String(percent))
+      api.LMSSetValue('cmi.core.score.min', '0')
+      api.LMSSetValue('cmi.core.score.max', '100')
+      if (setStatus) api.LMSSetValue('cmi.core.lesson_status', passed ? 'passed' : 'failed')
+      api.LMSCommit('')
+    }
+    log('SCORM ' + (found.name === 'API' ? '1.2' : '2004') + ':', percent + '%', passed ? 'passed' : 'failed')
+    return found.name
+  }
+
+  window.addEventListener('message', function (e) {
+    if (e.origin !== QUIZ) return
+    var d = e.data
+    if (!d || d.source !== 'elearning-react' || d.type !== 'finished' || !d.score) return
+    try {
+      var how = report(d.score, !!d.passed)
+      window.dispatchEvent(new CustomEvent('elearning-react:reported', { detail: { how: how, score: d.score, passed: d.passed } }))
+    } catch (err) {
+      log('could not report the score:', err)
+    }
+  })
+})()
