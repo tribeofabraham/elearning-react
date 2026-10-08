@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The quiz, embedded in another page · Mark Snyder</title>
+  <meta name="description" content="The MIDI quiz running in a frame inside an ordinary web page, served from learn.tribeofabraham.com, with nothing changed to make it work." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://learn.tribeofabraham.com/showcase/embedded/" />
+  <meta property="og:title" content="The quiz, embedded in another page" />
+  <meta property="og:description" content="One React module dropped into someone else's page as an ordinary iframe. Part of: one module, shipped four ways." />
+  <meta property="og:image" content="https://learn.tribeofabraham.com/showcase/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="theme-color" content="#000000" />
+  <link rel="icon" href="../../favicon.ico" sizes="any" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@300&family=Sorts+Mill+Goudy:ital@0;1&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../showcase.css" />
+</head>
+<body>
+  <a class="skip" href="#article">Skip to the article</a>
+
+  <header class="wrap">
+    <div class="brandbar">
+      <img src="../logo.svg" alt="" width="864" height="864" />
+      <p><span class="brand-name">Tribe of Abraham</span> <span class="app-name">E-Learning</span></p>
+    </div>
+    <div class="back">
+      <p><a href="../">Back to: one module, shipped four ways</a></p>
+      <p class="demo-label">Below: a stand-in for someone else’s site, with the quiz embedded in it.</p>
+    </div>
+  </header>
+
+  <main id="article" class="host-site" tabindex="-1">
+    <div class="wrap">
+    <div class="host-masthead"><p>Community music workshop · Members’ page</p></div>
+    <div class="host-layout">
+      <article class="host-article" aria-labelledby="title">
+        <h1 id="title">Getting started with MIDI</h1>
+        <p class="host-note">
+          <strong>This page stands in for someone else’s site.</strong>
+          The quiz below is running in a frame, served from learn.tribeofabraham.com. Nothing about it changed to make this work:
+          it’s the same build as the standalone quiz, placed here with one iframe tag.
+        </p>
+
+        <p>
+          MIDI is how a keyboard, a drum machine and a laptop agree on what’s being played. It doesn’t carry sound;
+          it carries the performance: which note, how hard, when it stops. If you play in a band that uses backing tracks
+          or a foot controller, MIDI is already in the room.
+        </p>
+        <p>
+          Before the workshop, try the short quiz below. It takes about five minutes, tells you why after each answer,
+          and shows your score at the end.
+        </p>
+
+        <h2 id="quiz-heading">Check what you know</h2>
+        <p><a href="#after-quiz">Skip past the quiz</a></p>
+        <iframe class="quiz-frame" src="https://learn.tribeofabraham.com/?quiz=midi-basics"
+                title="MIDI Basics quiz, served from learn.tribeofabraham.com" loading="lazy"
+                aria-describedby="frame-caption"></iframe>
+        <p class="frame-caption" id="frame-caption">The quiz scrolls inside its frame. Tab moves into it and on out the other side.</p>
+
+        <h2 id="after-quiz" tabindex="-1">After the quiz</h2>
+        <p>
+          Bring your score to the workshop. We’ll start with the questions most people find hardest: what velocity really
+          controls, why middle C is note 60, and what a sustain pedal is actually sending.
+        </p>
+      </article>
+
+      <aside class="host-aside" aria-labelledby="aside-title">
+        <h2 id="aside-title">About this page</h2>
+        <ul>
+          <li>An ordinary page with its own heading, text and layout.</li>
+          <li>The quiz is one iframe in the middle of it.</li>
+          <li>It records its results itself, with xAPI, wherever it’s placed.</li>
+        </ul>
+      </aside>
+    </div>
+    </div>
+  </main>
+
+  <footer class="wrap">
+    <p>Built to WCAG 2.1 AA and tested with axe.</p>
+    <p>Built by Mark Snyder · <a href="https://tribeofabraham.com/samples/">Portfolio<span class="visually-hidden"> of Mark Snyder’s work</span></a> · <a href="https://linkedin.com/in/mark-snyder-792798284">LinkedIn<span class="visually-hidden"> profile of Mark Snyder</span></a></p>
+  </footer>
+</body>
+</html>

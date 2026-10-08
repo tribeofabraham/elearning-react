@@ -1,0 +1,151 @@
+/* The showcase pages: plain documents, phone first, in the Tribe of Abraham look (the quiz's colours).
+   Contrast: text 4.5:1 or more, edges of controls and boundaries 3:1 or more (checked by
+   src/showcase.test.js). Everything in rem/em, so it reflows at 320px and at 200% zoom. */
+:root {
+  --bg: #000000;
+  --surface: #15110b;
+  --feature: #1d170e;
+  --line: #3a3020;
+  --edge: #8c7a55;
+  --paper: #f4efe6;
+  --cream: #e8e0d0;
+  --muted: #a89c88;
+  --brass: #b8923a;
+  --brass-light: #d4aa55;
+  --focus: #ffffff;
+  --display: 'Anton', Impact, 'Arial Narrow', sans-serif;
+  --light: 'Oswald', 'Arial Narrow', sans-serif;
+  --serif: 'Sorts Mill Goudy', Georgia, serif;
+  --sans: 'DM Sans', system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; }
+body { background: var(--bg); color: var(--cream); font: 1.0625rem/1.6 var(--sans); }
+a { color: var(--brass-light); text-underline-offset: 0.18em; }
+a:hover { color: var(--paper); }
+:focus-visible { outline: 0.18rem solid var(--focus); outline-offset: 0.2rem; border-radius: 0.15rem; }
+h1, h2, h3 { font-family: var(--serif); font-weight: 400; color: var(--paper); line-height: 1.2; font-variant-numeric: lining-nums; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+
+/* A link to jump past the top, shown when it has focus */
+.skip { position: absolute; left: 1rem; top: -4rem; background: var(--paper); color: #000; padding: 0.6rem 1rem; border-radius: 0.3rem; z-index: 10; font-weight: 500; }
+.skip:focus { top: 1rem; }
+
+.wrap { width: 100%; max-width: 70rem; margin: 0 auto; padding-inline: 1rem; }   /* the sides only: sections set their own top and bottom */
+
+/* The brand line, as the quiz's */
+.brandbar { display: flex; align-items: center; gap: 0.6rem; padding: 1rem 0; }
+.brandbar img { width: 2.2rem; height: 2.2rem; display: block; }
+.brandbar p { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 0.6rem; line-height: 1.1; }
+.brand-name { font-family: var(--display); font-size: 1.15rem; letter-spacing: 0.02em; text-transform: uppercase; color: #fff; }
+.app-name { font-family: var(--light); font-weight: 300; font-size: 1.2rem; letter-spacing: 0.06em; text-transform: uppercase; color: #fff; }
+
+/* The thesis */
+.hero { padding: 1.5rem 0 2rem; border-bottom: 0.0625rem solid var(--line); }
+.hero h1 { font-size: clamp(2.1rem, 7vw, 3.6rem); }
+.hero h1 span { display: block; color: var(--brass-light); font-style: italic; }
+.hero .context { margin-top: 1rem; max-width: 42rem; font-size: 1.1rem; color: var(--cream); }
+
+section { padding-block: 2rem; }
+section > h2 { font-size: 1.7rem; margin-bottom: 1rem; }
+.lead { color: var(--muted); max-width: 42rem; margin-bottom: 1.4rem; }
+
+/* The four deliveries: one column on a phone, two on wider screens, cmi5 across the full width */
+.deliveries { list-style: none; display: grid; gap: 1rem; grid-template-columns: minmax(0, 1fr); }
+.delivery {
+  background: var(--surface); border: 0.0625rem solid var(--edge); border-radius: 0.6rem;
+  padding: 1.3rem 1.3rem 1.4rem; display: flex; flex-direction: column; gap: 0.6rem;
+}
+.delivery h3 { font-size: 1.45rem; display: flex; align-items: baseline; gap: 0.6rem; }
+.num { font-family: var(--display); font-size: 1rem; color: #000; background: var(--brass); border-radius: 0.3rem; padding: 0.05rem 0.5rem; line-height: 1.5; flex-shrink: 0; }
+.delivery .what { color: var(--paper); font-size: 1.05rem; }
+.delivery .how { color: var(--cream); }
+.proves { border-left: 0.2rem solid var(--brass); padding-left: 0.8rem; color: var(--paper); }
+.proves strong { color: var(--brass-light); font-weight: 500; }
+.go { margin-top: auto; padding-top: 0.4rem; display: flex; flex-wrap: wrap; gap: 0.5rem 1.2rem; }
+.go a { font-weight: 500; }
+.go a::after { content: ' →'; }
+.button-link {
+  display: inline-block; background: var(--brass); color: #000; text-decoration: none; font-weight: 500;
+  padding: 0.6rem 1.1rem; border-radius: 0.35rem; border: 0.0625rem solid var(--brass);
+}
+.button-link:hover { background: var(--brass-light); color: #000; }
+.go a.button-link::after { content: ' →'; }
+
+/* cmi5 carries the most weight: full width, a warmer surface, the brass edge, and what happens */
+.delivery.featured { background: var(--feature); border: 0.125rem solid var(--brass); }
+.featured .flow { list-style: none; counter-reset: step; display: grid; gap: 0.4rem; margin: 0.3rem 0; }
+.featured .flow li { counter-increment: step; display: grid; grid-template-columns: 1.8rem 1fr; gap: 0.5rem; align-items: baseline; }
+.featured .flow li::before {
+  content: counter(step); font-family: var(--display); color: var(--brass-light); text-align: center;
+  border: 0.0625rem solid var(--edge); border-radius: 50%; width: 1.6rem; height: 1.6rem; line-height: 1.5rem; font-size: 0.85rem;
+}
+.same { margin-top: 1.2rem; color: var(--muted); max-width: 46rem; }
+
+/* The evidence: plain facts, dated */
+.evidence { list-style: none; display: grid; gap: 0.6rem; }
+.evidence li { border-left: 0.2rem solid var(--edge); padding: 0.2rem 0 0.2rem 0.9rem; }
+.evidence time, .evidence .where { color: var(--muted); font-size: 0.95rem; }
+.evidence .fact { display: block; color: var(--paper); }
+
+footer { border-top: 0.0625rem solid var(--line); padding-block: 1.6rem 2.4rem; margin-top: 1rem; color: var(--muted); }
+footer p + p { margin-top: 0.4rem; }
+
+@media (min-width: 46rem) {
+  .wrap { padding-inline: 2rem; }
+  .featured .body { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0.6rem 2rem; }
+}
+/* Wide: the first three side by side, cmi5 across the full width under them */
+@media (min-width: 62rem) {
+  .deliveries { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .delivery.featured { grid-column: 1 / -1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+}
+
+/* -- The embedded demo page --
+   The stand-in host site looks like a different site on purpose (light, its own type), so the dark
+   quiz in its frame plainly comes from somewhere else. The showcase's own bar and footer stay dark. */
+:root {
+  --h-bg: #f6f1e7;
+  --h-panel: #ffffff;
+  --h-text: #222222;
+  --h-muted: #5a5248;
+  --h-link: #6b3f00;
+  --h-edge: #7d6e55;
+  --h-note: #fff6dd;
+  --h-note-edge: #8a6a1f;
+}
+.back { padding-bottom: 1rem; }
+.demo-label { color: var(--muted); font-size: 0.95rem; margin-top: 0.2rem; }
+.host-site { background: var(--h-bg); color: var(--h-text); padding-block: 1.6rem 2.4rem; font-family: Georgia, 'Times New Roman', serif; }
+.host-site h1, .host-site h2 { color: var(--h-text); font-family: Georgia, 'Times New Roman', serif; font-weight: 700; }
+.host-site h1 { font-size: clamp(1.8rem, 6vw, 2.4rem); }
+.host-site a { color: var(--h-link); }
+.host-site a:hover { color: var(--h-text); }
+.host-site :focus-visible { outline-color: #000000; }
+.host-masthead { border-bottom: 0.125rem solid var(--h-text); padding-bottom: 0.6rem; margin-bottom: 1.2rem; }
+.host-masthead p { font-family: var(--sans); text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.85rem; color: var(--h-muted); }
+.host-note {
+  background: var(--h-note); border: 0.125rem solid var(--h-note-edge); border-radius: 0.4rem; padding: 0.9rem 1.1rem; margin: 1rem 0;
+  font-family: var(--sans); color: var(--h-text);
+}
+.host-note strong { font-weight: 500; }
+.host-article { max-width: 46rem; }
+.host-article p { margin: 0.8rem 0; }
+.host-article h2 { font-size: 1.5rem; margin-top: 1.4rem; }
+.quiz-frame {
+  display: block; width: 100%; height: 42rem; max-height: 85vh; min-height: 30rem;
+  border: 0.125rem dashed var(--h-edge); border-radius: 0.4rem; background: #000;
+}
+.frame-caption { color: var(--h-muted); font-size: 0.95rem; margin-top: 0.4rem; font-family: var(--sans); }
+.host-layout { display: grid; gap: 1.5rem; grid-template-columns: minmax(0, 1fr); }
+.host-aside { background: var(--h-panel); border: 0.0625rem solid var(--h-edge); border-radius: 0.4rem; padding: 1rem 1.2rem; align-self: start; }
+.host-aside h2 { font-size: 1.2rem; margin: 0 0 0.4rem; }
+.host-aside ul { padding-left: 1.2rem; }
+@media (min-width: 62rem) {
+  .host-layout { grid-template-columns: minmax(0, 1fr) 17rem; }
+}
