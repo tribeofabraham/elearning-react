@@ -4,16 +4,16 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>One module, shipped four ways · Mark Snyder</title>
-  <meta name="description" content="A React MIDI quiz built once and delivered four ways: hosted on its own, embedded in another site, through Lectora (SCORM 2004 + xAPI), and as a cmi5 lesson. Each reports to a real LRS." />
+  <meta name="description" content="A React MIDI quiz built once and delivered four ways: hosted on its own, embedded in another site, inside an authoring tool (SCORM 2004 + xAPI), and as a cmi5 lesson. Each reports to a real LRS." />
   <link rel="canonical" href="https://learn.tribeofabraham.com/showcase/" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://learn.tribeofabraham.com/showcase/" />
   <meta property="og:title" content="One module, shipped four ways" />
-  <meta property="og:description" content="Built once in React. Delivered standalone, embedded, through Lectora (SCORM 2004 + xAPI) and as cmi5. Same code every time." />
+  <meta property="og:description" content="Built once in React. Delivered standalone, embedded, inside an authoring tool (SCORM 2004 + xAPI) and as cmi5. Same code every time." />
   <meta property="og:image" content="https://learn.tribeofabraham.com/showcase/og.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content="One module, shipped four ways: standalone, embedded, Lectora SCORM 2004 + xAPI, cmi5." />
+  <meta property="og:image:alt" content="One module, shipped four ways: standalone, embedded, authoring tool SCORM 2004 + xAPI, cmi5." />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="theme-color" content="#000000" />
   <link rel="icon" href="../favicon.ico" sizes="any" />
@@ -60,31 +60,26 @@
         </li>
 
         <li class="delivery">
-          <h3><span class="num" aria-hidden="true">3</span> Lectora: SCORM 2004 + xAPI</h3>
-          <p class="what">Published through a commercial authoring tool, reporting on both standards at once.</p>
-          <p class="how">The Lectora course hosts the quiz and passes the learner in; the score and pass or fail go to SCORM 2004 while the quiz records the full xAPI detail.</p>
-          <p class="how">This lets a scored React element drop straight into an authoring tool’s web object, as in Lectora or Storyline. The example here uses a demo version of Lectora Online.</p>
+          <h3><span class="num" aria-hidden="true">3</span> Inside an authoring tool: SCORM 2004 + xAPI</h3>
+          <p class="what">Wrapped in a commercial authoring tool’s web object, reporting on both standards at once.</p>
+          <p class="how">The course passes the learner in; the score and pass or fail go to SCORM 2004 while the quiz records the full xAPI detail. Any tool with a web object works the same way, Storyline included.</p>
           <p class="proves"><strong>Proves:</strong> it survives the enterprise toolchain teams already own.</p>
-          <p class="go"><a href="https://app.cloud.scorm.com/sc/InvitationConfirmEmail?publicInvitationId=2563ee22-a93b-4c07-be53-68e166974f81">Open the Lectora course in SCORM Cloud (it asks for a name and email first)</a></p>
+          <p class="go"><a href="https://app.cloud.scorm.com/sc/InvitationConfirmEmail?publicInvitationId=2563ee22-a93b-4c07-be53-68e166974f81">Open the authoring-tool course in SCORM Cloud (it asks who you are first: that’s the LMS doing its job)</a></p>
         </li>
 
         <li class="delivery featured">
           <h3><span class="num" aria-hidden="true">4</span> cmi5</h3>
-          <div class="body">
-            <div>
-              <p class="what">One address that scores when an LMS launches it and explains itself when it doesn’t.</p>
-              <p class="proves"><strong>Proves:</strong> the LMS keeps launch, identity and the record; the content lives wherever you want, with no separate public build to keep in sync.</p>
-            </div>
-            <div>
-              <p class="how">When an LMS launches it:</p>
-              <ol class="flow">
-                <li>The LMS hands over a one-time sign-in and who the learner is.</li>
-                <li>The lesson reads the LMS’s pass mark and the learner’s preferences.</li>
-                <li>It reports to the LMS’s own LRS by the cmi5 rules: initialized, each answer, passed or failed, completed, terminated.</li>
-                <li>It returns the learner to the LMS.</li>
-              </ol>
-            </div>
+          <p class="what">One address that scores when an LMS launches it and explains itself when it doesn’t.</p>
+          <div class="how">
+            <p>When an LMS launches it:</p>
+            <ol class="flow">
+              <li>The LMS hands over a one-time sign-in and who the learner is.</li>
+              <li>The lesson reads the LMS’s pass mark and the learner’s preferences.</li>
+              <li>It reports to the LMS’s own LRS by the cmi5 rules: initialized, each answer, passed or failed, completed, terminated.</li>
+              <li>It returns the learner to the LMS.</li>
+            </ol>
           </div>
+          <p class="proves"><strong>Proves:</strong> the LMS keeps launch, identity and the record; the content lives wherever you want, with no separate public build to keep in sync.</p>
           <p class="go">
             <a class="button-link" href="https://learn.tribeofabraham.com/cmi5/">Open the cmi5 lesson directly (a practice run)</a>
           </p>
@@ -99,7 +94,7 @@
         <li><time datetime="2026-10-07">7 Oct 2026</time> <span class="where">· SCORM Cloud</span>
           <span class="fact">The cmi5 lesson, imported and launched, recorded its score and every statement from initialized to terminated.</span></li>
         <li><time datetime="2026-10-07">7 Oct 2026</time> <span class="where">· SCORM Cloud</span>
-          <span class="fact">The Lectora course reported SCORM 2004 and xAPI together, validated under concurrent sessions.</span></li>
+          <span class="fact">The authoring-tool course reported SCORM 2004 and xAPI together, validated under concurrent sessions. It was built with a demo version of Lectora Online; Storyline’s web object works the same way.</span></li>
         <li><time datetime="2026-10-07">7 Oct 2026</time> <span class="where">· SCORM Cloud LRS</span>
           <span class="fact">The standalone quiz’s statements, sent through the relay, read back from the LRS.</span></li>
         <li><time datetime="2026-10-08">8 Oct 2026</time> <span class="where">· axe-core 4.10</span>

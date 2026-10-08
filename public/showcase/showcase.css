@@ -94,7 +94,8 @@ footer p + p { margin-top: 0.4rem; }
 
 @media (min-width: 46rem) {
   .wrap { padding-inline: 2rem; }
-  .featured .body { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0.6rem 2rem; }
+  /* cmi5's steps in two columns on wider screens, so the panel keeps the others' rhythm without running long */
+  .featured .flow { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0.5rem 2rem; }
 }
 /* Wide: the first three side by side, cmi5 across the full width under them */
 @media (min-width: 62rem) {
