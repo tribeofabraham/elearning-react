@@ -81,6 +81,15 @@ section > h2 { font-size: 1.7rem; margin-bottom: 1rem; }
   content: counter(step); font-family: var(--display); color: var(--brass-light); text-align: center;
   border: 0.0625rem solid var(--edge); border-radius: 50%; width: 1.6rem; height: 1.6rem; line-height: 1.5rem; font-size: 0.85rem;
 }
+.featured code { font-size: 0.92em; color: var(--paper); }
+/* cmi5's two behaviours, side by side on wider screens: opened from the web, and launched by an LMS */
+.treatments { display: grid; gap: 1rem; grid-template-columns: minmax(0, 1fr); margin-top: 0.2rem; }
+.treatment {
+  border: 0.0625rem solid var(--edge); border-radius: 0.5rem; padding: 1rem 1.1rem 1.1rem;
+  display: flex; flex-direction: column; gap: 0.6rem; background: var(--surface);
+}
+.treatment h4 { font-size: 1.15rem; color: var(--brass-light); }
+.treatment .plain { padding-left: 1.2rem; display: grid; gap: 0.4rem; color: var(--cream); }
 .same { margin-top: 1.2rem; color: var(--muted); max-width: 46rem; }
 
 /* The evidence: plain facts, dated */
@@ -96,6 +105,9 @@ footer p + p { margin-top: 0.4rem; }
   .wrap { padding-inline: 2rem; }
   /* cmi5's steps in two columns on wider screens, so the panel keeps the others' rhythm without running long */
   .featured .flow { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0.5rem 2rem; }
+  /* the two behaviours side by side; each one's steps in a single column */
+  .treatments { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .featured .treatment .flow { grid-template-columns: minmax(0, 1fr); }
 }
 /* Wide: the first three side by side, cmi5 across the full width under them */
 @media (min-width: 62rem) {

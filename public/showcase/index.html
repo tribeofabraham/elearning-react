@@ -69,20 +69,30 @@
 
         <li class="delivery featured">
           <h3><span class="num" aria-hidden="true">4</span> cmi5</h3>
-          <p class="what">One address that scores when an LMS launches it and explains itself when it doesn’t.</p>
-          <div class="how">
-            <p>When an LMS launches it:</p>
-            <ol class="flow">
-              <li>The LMS hands over a one-time sign-in and who the learner is.</li>
-              <li>The lesson reads the LMS’s pass mark and the learner’s preferences.</li>
-              <li>It reports to the LMS’s own LRS by the cmi5 rules: initialized, each answer, passed or failed, completed, terminated.</li>
-              <li>It returns the learner to the LMS.</li>
-            </ol>
+          <p class="what">One address, two behaviours: it scores when an LMS launches it and explains itself when it doesn’t.</p>
+          <p class="how">The LMS imports a package that is only a 1 KB <code>cmi5.xml</code> pointing at <code>learn.tribeofabraham.com/cmi5/</code>. The lesson stays on my server, so an update reaches every LMS at once, with nothing to re-import.</p>
+          <div class="treatments">
+            <div class="treatment">
+              <h4>Opened straight from the web</h4>
+              <ul class="plain">
+                <li>No LMS launched it, so no launch details arrive: it doesn’t know who you are.</li>
+                <li>There’s no learning record store to report to, so no score or completion is kept.</li>
+                <li>It says so, and runs as a practice round.</li>
+              </ul>
+              <p class="go"><a class="button-link" href="https://learn.tribeofabraham.com/cmi5/">Open it directly (a practice run)</a></p>
+            </div>
+            <div class="treatment">
+              <h4>Launched by an LMS</h4>
+              <ol class="flow">
+                <li>The LMS hands over a one-time sign-in and who the learner is.</li>
+                <li>The lesson reads the LMS’s pass mark and the learner’s preferences.</li>
+                <li>It reports to the LMS’s own LRS by the cmi5 rules: initialized, each answer, passed or failed, completed, terminated.</li>
+                <li>It returns the learner to the LMS, where the score and completion are recorded.</li>
+              </ol>
+              <p class="go"><a class="button-link" href="https://app.cloud.scorm.com/sc/InvitationConfirmEmail?publicInvitationId=e6cc192e-0ec6-443b-9f07-a44cb01b917c">Launch it in SCORM Cloud (it asks who you are first: that’s the LMS doing its job)</a></p>
+            </div>
           </div>
           <p class="proves"><strong>Proves:</strong> the LMS keeps launch, identity and the record; the content lives wherever you want, with no separate public build to keep in sync.</p>
-          <p class="go">
-            <a class="button-link" href="https://learn.tribeofabraham.com/cmi5/">Open the cmi5 lesson directly (a practice run)</a>
-          </p>
         </li>
       </ol>
       <p class="same">All four run the same React code, the same ten questions and the same accessible screens. Only the way each one reports changes.</p>
