@@ -6,12 +6,15 @@
   "scripts": {
     "dev": "concurrently -n server,client -c blue,magenta \"npm run server\" \"vite\"",
     "server": "node --watch --env-file-if-exists=.env server/index.js",
-    "build": "vite build",
+    "build": "vite build && node scripts/brand-static.mjs",
+    "build:studios": "vite build --mode studios && node scripts/brand-static.mjs studios",
     "start": "node --env-file-if-exists=.env server/index.js",
     "test": "node --test \"shared/**/*.test.js\" \"src/**/*.test.js\"",
     "preview": "vite preview",
     "deploy": "bash deploy/deploy.sh",
-    "setup": "bash deploy/setup.sh"
+    "deploy:studios": "bash deploy/deploy.sh studios",
+    "setup": "bash deploy/setup.sh",
+    "setup:studios": "bash deploy/setup.sh studios"
   },
   "dependencies": {
     "express": "^5.2.1",

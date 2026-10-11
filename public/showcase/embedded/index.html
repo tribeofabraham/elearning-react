@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>The quiz, embedded in another page · Mark Snyder</title>
-  <meta name="description" content="The MIDI quiz running in a frame inside an ordinary web page, served from learn.tribeofabraham.com, with nothing changed to make it work." />
+  <title>The quiz, embedded in another page · %BYLINE%</title>
+  <meta name="description" content="The MIDI quiz running in a frame inside an ordinary web page, served from %SITE_HOST%, with nothing changed to make it work." />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://learn.tribeofabraham.com/showcase/embedded/" />
+  <meta property="og:url" content="%SITE%/showcase/embedded/" />
   <meta property="og:title" content="The quiz, embedded in another page" />
   <meta property="og:description" content="One React module dropped into someone else's page as an ordinary iframe. Part of: one module, shipped four ways." />
-  <meta property="og:image" content="https://learn.tribeofabraham.com/showcase/og.png" />
+  <meta property="og:image" content="%OG_IMAGE%" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
@@ -20,13 +20,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@300&family=Sorts+Mill+Goudy:ital@0;1&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../showcase.css" />
 </head>
-<body>
+<body data-brand="%BRAND%">
   <a class="skip" href="#article">Skip to the article</a>
 
   <header class="wrap">
     <div class="brandbar">
-      <img src="../logo.svg" alt="" width="864" height="864" />
-      <p><span class="brand-name">Tribe of Abraham</span> <span class="app-name">E-Learning</span></p>
+      <img src="../%LOGO%" alt="" width="864" height="864" />
+      <p><span class="brand-name">%BRAND_NAME%</span> <span class="app-name">%APP_NAME%</span></p>
     </div>
     <div class="back">
       <p><a href="../">Back to: one module, shipped four ways</a></p>
@@ -42,7 +42,7 @@
         <h1 id="title">Getting started with MIDI</h1>
         <p class="host-note">
           <strong>This page stands in for someone else’s site.</strong>
-          The quiz below is running in a frame, served from learn.tribeofabraham.com. Nothing about it changed to make this work:
+          The quiz below is running in a frame, served from %SITE_HOST%. Nothing about it changed to make this work:
           it’s the same build as the standalone quiz, placed here with one iframe tag.
         </p>
 
@@ -58,8 +58,8 @@
 
         <h2 id="quiz-heading">Check what you know</h2>
         <p><a href="#after-quiz">Skip past the quiz</a></p>
-        <iframe class="quiz-frame" src="https://learn.tribeofabraham.com/?quiz=midi-basics"
-                title="MIDI Basics quiz, served from learn.tribeofabraham.com" loading="lazy"
+        <iframe class="quiz-frame" src="%SITE%/?quiz=midi-basics"
+                title="MIDI Basics quiz, served from %SITE_HOST%" loading="lazy"
                 aria-describedby="frame-caption"></iframe>
         <p class="frame-caption" id="frame-caption">The quiz scrolls inside its frame. Tab moves into it and on out the other side.</p>
 
@@ -84,7 +84,7 @@
 
   <footer class="wrap">
     <p>Built to WCAG 2.1 AA and tested with axe.</p>
-    <p>Built by Mark Snyder · <a href="https://tribeofabraham.com/samples/">Portfolio<span class="visually-hidden"> of Mark Snyder’s work</span></a> · <a href="https://linkedin.com/in/mark-snyder-792798284">LinkedIn<span class="visually-hidden"> profile of Mark Snyder</span></a></p>
+    <p>%FOOTER%</p>
   </footer>
 </body>
 </html>

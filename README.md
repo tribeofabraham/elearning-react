@@ -23,6 +23,22 @@ Record Store (LRS) such as SCORM Cloud.
   two-column landscape layout for wide, short frames like a Lectora Web Window or a phone on its side. Checked
   with axe: no violations.
 
+## Two copies
+
+The same code runs as two sites on the VPS, each with its own folder, service, port and .env:
+
+| | Address | Build | Deploy |
+|---|---|---|---|
+| Tribe of Abraham (the default) | learn.tribeofabraham.com (port 3030) | `npm run build` | `npm run deploy` |
+| Ragamuffin Studios | learn.ragamuffinstudios.com (port 3031) | `npm run build:studios` | `npm run deploy:studios` |
+
+The Studios build reads `.env.studios`: its name, logo, home link, activity ids
+(`https://ragamuffinstudios.com/xapi/elearning/…`), its cmi5 lesson (ragamuffinstudios.com/cmi5/) and
+its SCORM Cloud invitations. The quiz takes them from `src/brand.js`; the showcase and demo pages,
+plain HTML in `public/`, get them from `scripts/brand-static.mjs` after the build. An invitation left
+empty shows "available on request" instead of a link. First time for the Studios copy:
+`npm run setup:studios`.
+
 ## How an attempt is recorded
 
 ```

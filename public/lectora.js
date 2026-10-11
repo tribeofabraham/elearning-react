@@ -2,7 +2,7 @@
  * For the page around the quiz in a Lectora course (or any SCORM course). One line, in an HTML
  * Extension on the page that has the quiz's Web Window:
  *
- *   <script src="https://learn.tribeofabraham.com/lectora.js"></script>
+ *   <script src="https://<the server the quiz is on>/lectora.js"></script>
  *
  * 1. Tells the quiz who the learner is, from Lectora's AICC_Student_Name and AICC_Student_ID, so it
  *    doesn't ask. By message ({ source: 'elearning-host', type: 'learner', name, id }), answering

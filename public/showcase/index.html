@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>One module, shipped four ways · Mark Snyder</title>
+  <title>One module, shipped four ways · %BYLINE%</title>
   <meta name="description" content="A React MIDI quiz built once and delivered four ways: hosted on its own, embedded in another site, inside an authoring tool (SCORM 2004 + xAPI), and as a cmi5 lesson. Each reports to a real LRS." />
-  <link rel="canonical" href="https://learn.tribeofabraham.com/showcase/" />
+  <link rel="canonical" href="%SITE%/showcase/" />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://learn.tribeofabraham.com/showcase/" />
+  <meta property="og:url" content="%SITE%/showcase/" />
   <meta property="og:title" content="One module, shipped four ways" />
   <meta property="og:description" content="Built once in React. Delivered standalone, embedded, inside an authoring tool (SCORM 2004 + xAPI) and as cmi5. Same code every time." />
-  <meta property="og:image" content="https://learn.tribeofabraham.com/showcase/og.png" />
+  <meta property="og:image" content="%OG_IMAGE%" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta property="og:image:alt" content="One module, shipped four ways: standalone, embedded, authoring tool SCORM 2004 + xAPI, cmi5." />
@@ -22,13 +22,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@300&family=Sorts+Mill+Goudy:ital@0;1&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="showcase.css" />
 </head>
-<body>
+<body data-brand="%BRAND%">
   <a class="skip" href="#deliveries">Skip to the four deliveries</a>
 
   <header class="wrap">
     <div class="brandbar">
-      <img src="logo.svg" alt="" width="864" height="864" />
-      <p><span class="brand-name">Tribe of Abraham</span> <span class="app-name">E-Learning</span></p>
+      <img src="%LOGO%" alt="" width="864" height="864" />
+      <p><span class="brand-name">%BRAND_NAME%</span> <span class="app-name">%APP_NAME%</span></p>
     </div>
     <div class="hero">
       <h1>One module, shipped four ways. <span>Same code every time.</span></h1>
@@ -45,10 +45,10 @@
       <ol class="deliveries">
         <li class="delivery">
           <h3><span class="num" aria-hidden="true">1</span> Hosted standalone</h3>
-          <p class="what">On my own server, with no LMS involved.</p>
+          <p class="what">On %OUR% own server, with no LMS involved.</p>
           <p class="how">A small Node relay records each attempt as xAPI, so no LRS credentials ever reach the browser.</p>
           <p class="proves"><strong>Proves:</strong> the content doesn’t need a platform.</p>
-          <p class="go"><a href="https://learn.tribeofabraham.com/">Take the standalone quiz</a></p>
+          <p class="go"><a href="%SITE%/">Take the standalone quiz</a></p>
         </li>
 
         <li class="delivery">
@@ -64,13 +64,13 @@
           <p class="what">Wrapped in an authoring tool’s web object (built here in Lectora; Storyline’s works the same way), reporting on both standards at once.</p>
           <p class="how">The course passes the learner in; the score and pass or fail go to SCORM 2004 while the quiz records the full xAPI detail.</p>
           <p class="proves"><strong>Proves:</strong> it survives the enterprise toolchain teams already own.</p>
-          <p class="go"><a href="https://app.cloud.scorm.com/sc/InvitationConfirmEmail?publicInvitationId=2563ee22-a93b-4c07-be53-68e166974f81">Open the authoring-tool course in SCORM Cloud (it asks who you are first: that’s the LMS doing its job)</a></p>
+          <p class="go"><a href="%LECTORA_INVITE%">Open the authoring-tool course in SCORM Cloud (it asks who you are first: that’s the LMS doing its job)</a></p>
         </li>
 
         <li class="delivery featured">
           <h3><span class="num" aria-hidden="true">4</span> cmi5</h3>
           <p class="what">One address, two behaviours: it scores when an LMS launches it and explains itself when it doesn’t.</p>
-          <p class="how">The LMS imports a package that is only a 1 KB <code>cmi5.xml</code> pointing at <code>learn.tribeofabraham.com/cmi5/</code>. The lesson stays on my server, so an update reaches every LMS at once, with nothing to re-import.</p>
+          <p class="how">The LMS imports a package that is only a 1 KB <code>cmi5.xml</code> pointing at <code>%CMI5_HOST_PATH%</code>. The lesson stays on %OUR% server, so an update reaches every LMS at once, with nothing to re-import.</p>
           <div class="treatments">
             <div class="treatment">
               <h4>Opened straight from the web</h4>
@@ -79,7 +79,7 @@
                 <li>There’s no learning record store to report to, so no score or completion is kept.</li>
                 <li>It says so, and runs as a practice round.</li>
               </ul>
-              <p class="go"><a class="button-link" href="https://learn.tribeofabraham.com/cmi5/">Open it directly (a practice run)</a></p>
+              <p class="go"><a class="button-link" href="%CMI5_URL%">Open it directly (a practice run)</a></p>
             </div>
             <div class="treatment">
               <h4>Launched by an LMS</h4>
@@ -89,7 +89,7 @@
                 <li>It reports to the LMS’s own LRS by the cmi5 rules: initialized, each answer, passed or failed, completed, terminated.</li>
                 <li>It returns the learner to the LMS, where the score and completion are recorded.</li>
               </ol>
-              <p class="go"><a class="button-link" href="https://app.cloud.scorm.com/sc/InvitationConfirmEmail?publicInvitationId=e6cc192e-0ec6-443b-9f07-a44cb01b917c">Launch it in SCORM Cloud (it asks who you are first: that’s the LMS doing its job)</a></p>
+              <p class="go"><a class="button-link" href="%CMI5_INVITE%">Launch it in SCORM Cloud (it asks who you are first: that’s the LMS doing its job)</a></p>
             </div>
           </div>
           <p class="proves"><strong>Proves:</strong> the LMS keeps launch, identity and the record; the content lives wherever you want, with no separate public build to keep in sync.</p>
@@ -115,7 +115,7 @@
 
   <footer class="wrap">
     <p>Built to WCAG 2.1 AA and tested with axe.</p>
-    <p>Built by Mark Snyder · <a href="https://tribeofabraham.com/samples/">Portfolio<span class="visually-hidden"> of Mark Snyder’s work</span></a> · <a href="https://linkedin.com/in/mark-snyder-792798284">LinkedIn<span class="visually-hidden"> profile of Mark Snyder</span></a></p>
+    <p>%FOOTER%</p>
   </footer>
 </body>
 </html>

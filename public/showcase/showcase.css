@@ -39,6 +39,8 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 400; color: var(--paper); l
 .brandbar img { width: 2.2rem; height: 2.2rem; display: block; }
 .brandbar p { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 0.6rem; line-height: 1.1; }
 .brand-name { font-family: var(--display); font-size: 1.15rem; letter-spacing: 0.02em; text-transform: uppercase; color: #fff; }
+[data-brand='studios'] .brand-name { font-family: var(--serif, 'Sorts Mill Goudy', Georgia, serif); font-size: 1.4rem; letter-spacing: 0; text-transform: none; }
+.on-request { color: var(--muted, #a89c88); font-style: italic; }
 .app-name { font-family: var(--light); font-weight: 300; font-size: 1.2rem; letter-spacing: 0.06em; text-transform: uppercase; color: #fff; }
 
 /* The thesis */

@@ -12,13 +12,24 @@
 set -euo pipefail
 
 SERVER="${ELEARNING_SERVER:-root@50.6.206.202}"
-DOMAIN="${ELEARNING_DOMAIN:-learn.tribeofabraham.com}"
+# `bash deploy/setup.sh` sets up the Tribe of Abraham copy; `bash deploy/setup.sh studios` the
+# Ragamuffin Studios one (learn.ragamuffinstudios.com, /srv/elearning-studios/app, port 3031, service
+# elearning-studios). Both run as the elearning user.
+INSTANCE="${1:-toa}"
+if [ "$INSTANCE" = studios ]; then
+  DOMAIN="${ELEARNING_DOMAIN:-learn.ragamuffinstudios.com}"; HOME_DIR=/srv/elearning-studios
+  PORT=3031; SERVICE=elearning-studios; LABEL="Ragamuffin Studios"
+else
+  DOMAIN="${ELEARNING_DOMAIN:-learn.tribeofabraham.com}"; HOME_DIR=/srv/elearning
+  PORT=3030; SERVICE=elearning-react; LABEL="Tribe of Abraham"
+fi
 cd "$(dirname "$0")/.."
 quiet() { grep -v -E 'post-quantum|store now|upgraded|^\*\* ' || true; }
 
 echo "Setting up $SERVER…"
-scp -q -o BatchMode=yes deploy/elearning-react.service "$SERVER:/tmp/elearning-react.service"
-ssh -o BatchMode=yes "$SERVER" "DOMAIN=$DOMAIN bash -s" 2>&1 <<'REMOTE' | quiet
+# The service file, for this copy's folder and port
+sed -e "s|/srv/elearning/app|$HOME_DIR/app|" -e "s|PORT=3030|PORT=$PORT|" -e "s|^Description=Tribe of Abraham|Description=$LABEL|"   deploy/elearning-react.service | ssh -o BatchMode=yes "$SERVER" "cat > /tmp/$SERVICE.service"
+ssh -o BatchMode=yes "$SERVER" "DOMAIN=$DOMAIN HOME_DIR=$HOME_DIR PORT=$PORT SERVICE=$SERVICE LABEL='$LABEL' bash -s" 2>&1 <<'REMOTE' | quiet
 set -euo pipefail
 
 # -- 1. Node, the user, the folder --
@@ -34,20 +45,20 @@ echo "  ✔ Node $(node --version), npm $(npm --version)"
 if ! id elearning >/dev/null 2>&1; then
   useradd --system --home-dir /srv/elearning --shell /sbin/nologin elearning
 fi
-mkdir -p /srv/elearning/app
-chown -R elearning:elearning /srv/elearning
-chmod 750 /srv/elearning
-echo "  ✔ User elearning, /srv/elearning/app"
+mkdir -p $HOME_DIR/app
+chown -R elearning:elearning $HOME_DIR
+chmod 750 $HOME_DIR
+echo "  ✔ User elearning, $HOME_DIR/app"
 
 # -- 2. The service --
-if ! cmp -s /tmp/elearning-react.service /etc/systemd/system/elearning-react.service; then
-  mv /tmp/elearning-react.service /etc/systemd/system/elearning-react.service
-  restorecon /etc/systemd/system/elearning-react.service 2>/dev/null || true
+if ! cmp -s /tmp/$SERVICE.service /etc/systemd/system/$SERVICE.service; then
+  mv /tmp/$SERVICE.service /etc/systemd/system/$SERVICE.service
+  restorecon /etc/systemd/system/$SERVICE.service 2>/dev/null || true
   systemctl daemon-reload
 fi
-rm -f /tmp/elearning-react.service
-systemctl enable -q elearning-react
-echo "  ✔ Service elearning-react (starts once the app is deployed)"
+rm -f /tmp/$SERVICE.service
+systemctl enable -q $SERVICE
+echo "  ✔ Service $SERVICE (starts once the app is deployed)"
 
 # -- 3. Caddy, once the DNS is in place --
 here=$(curl -s -4 -m 10 https://api.ipify.org || true)
@@ -62,10 +73,10 @@ else
   cp /etc/caddy/Caddyfile /etc/caddy/Caddyfile.bak
   cat >> /etc/caddy/Caddyfile <<CADDY
 
-# Tribe of Abraham e-learning: HTTPS (automatic certificate) in front of the app on 127.0.0.1:3030
+# $LABEL e-learning: HTTPS (automatic certificate) in front of the app on 127.0.0.1:$PORT
 $DOMAIN {
 	encode gzip
-	reverse_proxy 127.0.0.1:3030
+	reverse_proxy 127.0.0.1:$PORT
 }
 CADDY
   if caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile >/dev/null 2>&1; then
@@ -78,4 +89,4 @@ CADDY
   fi
 fi
 REMOTE
-echo "Done. Next: bash deploy/deploy.sh"
+echo "Done. Next: bash deploy/deploy.sh $INSTANCE"

@@ -5,7 +5,7 @@
 // xAPI panel shows live: subscribe(fn) to hear of changes, log() for the current list.
 import { XAPI_VERSION, learnerActor, statementsFor } from '../shared/xapi.js'
 
-const DEFAULT_ACTIVITY_BASE = 'https://tribeofabraham.com/xapi/elearning-react'
+const DEFAULT_ACTIVITY_BASE = import.meta.env?.VITE_ACTIVITY_BASE || 'https://tribeofabraham.com/xapi/elearning-react'
 
 export class RecordError extends Error {}
 
