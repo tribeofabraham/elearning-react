@@ -20,10 +20,18 @@ const TOA = {
   OUR: 'my',
   LECTORA_INVITE: 'https://app.cloud.scorm.com/sc/InvitationConfirmEmail?publicInvitationId=2563ee22-a93b-4c07-be53-68e166974f81',
   CMI5_INVITE: 'https://app.cloud.scorm.com/sc/InvitationConfirmEmail?publicInvitationId=e6cc192e-0ec6-443b-9f07-a44cb01b917c',
+  // The authoring-tool course link opening in a new window (on: the Studios copy, whose course is the
+  // Tribe of Abraham one), said in the link so it's no surprise
+  LECTORA_NEW_WINDOW: '',
+  LECTORA_NEW_WINDOW_NOTE: '',
   FOOTER: 'Built by Mark Snyder · <a href="https://tribeofabraham.com/samples/">Portfolio<span class="visually-hidden"> of Mark Snyder’s work</span></a> · <a href="https://linkedin.com/in/mark-snyder-792798284">LinkedIn<span class="visually-hidden"> profile of Mark Snyder</span></a>',
 }
 const value = (k) => (`VITE_${k}` in env ? env[`VITE_${k}`] : TOA[k])
 const tokens = Object.fromEntries(Object.keys(TOA).map((k) => [k, value(k)]))
+if (tokens.LECTORA_NEW_WINDOW === 'on') {
+  tokens.LECTORA_NEW_WINDOW = ' target="_blank" rel="noopener"'
+  tokens.LECTORA_NEW_WINDOW_NOTE = ' (opens in a new window)'
+}
 tokens.SITE_HOST = tokens.SITE.replace(/^https?:\/\//, '')
 tokens.CMI5_HOST_PATH = tokens.CMI5_URL.replace(/^https?:\/\//, '')
 
