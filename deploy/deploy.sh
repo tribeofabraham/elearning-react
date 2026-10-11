@@ -41,12 +41,16 @@ npm run "$BUILD" --silent >/dev/null || { echo "✖ The page didn't build. Nothi
 echo "Deploying $commit ($LABEL) to $SERVER…"
 # The LRS key: copied up the first time only, never overwritten (the server's own may differ)
 if ! ssh -o BatchMode=yes "$SERVER" "test -f $APP/.env" 2>/dev/null; then
-  [ -f .env ] || { echo "✖ No .env here to copy up. Copy .env.example to .env and fill in the LRS details."; exit 1; }
-  scp -q -o BatchMode=yes .env "$SERVER:$APP/.env"
-  if [ "$INSTANCE" = studios ]; then   # its statements under the Studios' own activity ids
-    ssh -o BatchMode=yes "$SERVER" "sed -i '/^ACTIVITY_BASE=/d' $APP/.env && echo ACTIVITY_BASE=https://ragamuffinstudios.com/xapi/elearning >> $APP/.env" 2>&1 | quiet
+  if [ "$INSTANCE" = studios ]; then
+    # The same LRS as the Tribe of Abraham copy (its .env, on the server), under the Studios' own activity ids
+    ssh -o BatchMode=yes "$SERVER" "test -f /srv/elearning/app/.env && sed '/^ACTIVITY_BASE=/d' /srv/elearning/app/.env > $APP/.env && echo ACTIVITY_BASE=https://ragamuffinstudios.com/xapi/elearning >> $APP/.env" 2>&1 | quiet
+    ssh -o BatchMode=yes "$SERVER" "test -f $APP/.env" 2>/dev/null || { echo "✖ No LRS details on the server to copy. Deploy the Tribe of Abraham copy first, or put a .env in $APP."; exit 1; }
+    echo "  ✔ Gave the Studios copy the LRS details (from the Tribe of Abraham copy on the server)"
+  else
+    [ -f .env ] || { echo "✖ No .env here to copy up. Copy .env.example to .env and fill in the LRS details."; exit 1; }
+    scp -q -o BatchMode=yes .env "$SERVER:$APP/.env"
+    echo "  ✔ Copied your .env (the LRS details) to the server"
   fi
-  echo "  ✔ Copied your .env (the LRS details) to the server"
 fi
 # dist/ isn't in git, so the built page goes up beside the code
 tar -c dist | ssh -o BatchMode=yes "$SERVER" "rm -rf /tmp/elearning-dist && mkdir /tmp/elearning-dist && tar -x -C /tmp/elearning-dist" 2>&1 | quiet
